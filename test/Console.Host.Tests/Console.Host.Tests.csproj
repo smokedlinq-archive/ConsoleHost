@@ -13,8 +13,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\ConsoleHost.Abstractions\ConsoleHost.Abstractions.csproj" />
-    <ProjectReference Include="..\..\src\ConsoleHost\ConsoleHost.csproj" />
+    <ProjectReference Include="..\..\src\Console.Host.Abstractions\Console.Host.Abstractions.csproj" />
+    <ProjectReference Include="..\..\src\Console.Host\Console.Host.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
   </ItemGroup>
 
 </Project>
