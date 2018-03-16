@@ -12,7 +12,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ConsoleHost\ConsoleHost.csproj" />
+    <ProjectReference Include="..\..\src\ConsoleHost.Abstractions\ConsoleHost.Abstractions.csproj" />
+    <ProjectReference Include="..\..\src\ConsoleHost\ConsoleHost.csproj" />
   </ItemGroup>
 
 </Project>

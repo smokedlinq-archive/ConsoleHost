@@ -5,9 +5,15 @@ VisualStudioVersion = 15.0.27130.2027
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleHost", "src\ConsoleHost\ConsoleHost.csproj", "{D6756D82-759C-49C3-A729-A3475C36BB13}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleHost.Tests", "src\ConsoleHost.Tests\ConsoleHost.Tests.csproj", "{DA22610D-E680-443B-B586-517616CC86AE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleHost.Tests", "test\ConsoleHost.Tests\ConsoleHost.Tests.csproj", "{DA22610D-E680-443B-B586-517616CC86AE}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleHost.Abstractions", "src\ConsoleHost.Abstractions\ConsoleHost.Abstractions.csproj", "{1FB79DF6-9958-4FEF-84CB-70C672CBB6C6}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{4E21BD8D-81AE-4AE9-97D6-5832ECA3509F}"
+	ProjectSection(SolutionItems) = preProject
+		LICENSE = LICENSE
+		readme.md = readme.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -5,7 +5,7 @@ The library is based on .NET Standard 2.0 compliance which enables the console a
 
 The basic usage of a ConsoleHost requires creating a ConsoleHostBuilder, building the ConsoleHost instance, and calling it's Run() method. 
 
-The magic of command line parsing, dependency injection, and is handled by the ConsoleHost instance.
+The magic of command line parsing, dependency injection, and logging is handled by the ConsoleHost instance.
 
 ## Basic Usage Example
 ```csharp

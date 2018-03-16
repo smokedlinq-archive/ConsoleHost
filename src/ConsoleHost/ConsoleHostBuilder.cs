@@ -13,7 +13,7 @@ namespace System
     public class ConsoleHostBuilder
     {
         private readonly string[] _args;
-        private readonly ConfigurationBuilder _config = new ConfigurationBuilder();
+        private readonly IConfiguration _config;
         private readonly Assembly _configuringAssembly;
         private readonly List<Action<IConfigurationBuilder>> _configureAppConfigurationDelegates = new List<Action<IConfigurationBuilder>>();
         private readonly List<Action<ILoggerFactory>> _configureLoggingDelegates = new List<Action<ILoggerFactory>>();
@@ -22,8 +22,11 @@ namespace System
         public ConsoleHostBuilder(string[] args = null)
         {
             _args = args ?? new string[0];
-            _config.AddCommandLine(args);
-            
+            _config = new ConfigurationBuilder()
+                        .AddCommandLine(args)
+                        .AddEnvironmentVariables()
+                        .Build();
+
             _configuringAssembly = new StackTrace().GetFrames()[2].GetMethod().ReflectedType.Assembly;
 
             this.AddCommandLine(_configuringAssembly);
@@ -50,6 +53,19 @@ namespace System
             _configureAppConfigurationDelegates.Add(configure ?? throw new ArgumentNullException(nameof(configure)));
             return this;
         }
+
+        public ConsoleHostBuilder UseSetting(string key, string value)
+        {
+            if (string.IsNullOrEmpty(key))
+                throw new ArgumentNullException(nameof(key));
+
+            _config[key] = value;
+
+            return this;
+        }
+
+        public string GetSetting(string key)
+            => _config[key];
 
         public ConsoleHostBuilder ConfigureLogging(Action<ILoggerFactory> configure)
         {
@@ -83,10 +99,13 @@ namespace System
 
         private IConfiguration BuildConfiguration()
         {
+            var builder = new ConfigurationBuilder()
+                            .AddInMemoryCollection(_config.AsEnumerable());
+            
             foreach (var configure in _configureAppConfigurationDelegates)
-                configure(_config);
+                configure(builder);
 
-            return _config.Build();
+            return builder.Build();
         }
 
         private IServiceCollection ConfigureServices(IConfiguration config)

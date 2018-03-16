@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -24,7 +25,9 @@ namespace Tests
         {
             ConsoleHost
                 .CreateBuilder(new string[0])
-                .Configure(_ => { })
+                .UseSetting("SETTING", "VALUE")
+                .AddCommandLine<MockConsoleAppConfig>(MockConsoleAppConfig.SwitchMappings)
+                .Configure(x => { x.GetSetting("SETTING"); })
                 .ConfigureAppConfiguration(_ => { })
                 .ConfigureLogging(_ => { })
                 .ConfigureServices(_ => { })
