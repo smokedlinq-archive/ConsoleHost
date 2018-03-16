@@ -27,7 +27,7 @@ namespace System
                         .AddEnvironmentVariables()
                         .Build();
 
-            _configuringAssembly = new StackTrace().GetFrames()[2].GetMethod().ReflectedType.Assembly;
+            _configuringAssembly = GetConfiguringAssembly();
 
             this.AddCommandLine(_configuringAssembly);
         }
@@ -154,5 +154,13 @@ namespace System
                     configure(loggerFactory);
             }
         }
+
+        private static Assembly GetConfiguringAssembly()
+            => new StackTrace()
+                .GetFrames()
+                .First(frame => frame.GetMethod().ReflectedType.Assembly != typeof(ConsoleHostBuilder).Assembly)
+                .GetMethod()
+                .ReflectedType
+                .Assembly;
     }
 }
