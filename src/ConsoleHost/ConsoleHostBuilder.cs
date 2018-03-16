@@ -128,12 +128,12 @@ namespace System
         {
             Debug.Assert(services != null);
 
-            if (services.Count(service => service.ServiceType == typeof(IConsoleApp)) == 0)
+            if (!services.Any(service => service.ServiceType == typeof(IConsoleApp)))
             {
                 foreach (var type in _configuringAssembly.GetTypes().Where(t => t.IsPublic && !t.IsAbstract && typeof(IConsoleApp).IsAssignableFrom(t)))
                     services.AddTransient(typeof(IConsoleApp), type);
 
-                if (services.Count(service => service.ServiceType == typeof(IConsoleApp)) == 0)
+                if (!services.Any(service => service.ServiceType == typeof(IConsoleApp)))
                     throw new InvalidOperationException($"The ConsoleHostBuilder could not find a type that implements IConsoleApp; add a public class that implements IConsoleApp to the assembly '{_configuringAssembly.FullName}' or explicitly call UseApp<T>() to specify the type to use.");
             }
         }
