@@ -2,13 +2,11 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace System
 {
-    public interface IConsoleApp
+    public interface IConfigureServices
     {
-        Task RunAsync(CancellationToken cancellationToken);
+        void Configure(IServiceCollection container);
     }
 }

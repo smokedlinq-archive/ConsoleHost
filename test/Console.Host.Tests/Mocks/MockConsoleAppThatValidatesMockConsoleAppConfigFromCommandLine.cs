@@ -1,33 +1,14 @@
-﻿using System;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Tests
 {
-    public class MockConsoleApp : IConsoleApp
-    {
-        private readonly MockConsoleAppConfig _config;
-
-        public MockConsoleApp(MockConsoleAppConfig config)
-        {
-            _config = config ?? throw new ArgumentNullException(nameof(config));
-        }
-
-        public void ConfigureServices(IServiceCollection container)
-        {
-        }
-
-        public Task RunAsync(IServiceProvider factory, CancellationToken cancellationToken)
-        {
-            return Task.CompletedTask;
-        }
-    }
-
-    internal class MockConsoleAppThatValidatesMockConsoleAppConfig : IConsoleApp
+    internal class MockConsoleAppThatValidatesMockConsoleAppConfigFromCommandLine : IConsoleApp
     {
         internal static readonly string[] Args =
             new string[]
@@ -41,14 +22,10 @@ namespace Tests
 
         private readonly MockConsoleAppConfig _config;
 
-        public MockConsoleAppThatValidatesMockConsoleAppConfig(MockConsoleAppConfig config)
+        public MockConsoleAppThatValidatesMockConsoleAppConfigFromCommandLine(MockConsoleAppConfig config)
             => _config = config ?? throw new ArgumentNullException(nameof(config));
 
-        public void ConfigureServices(IServiceCollection container)
-        {
-        }
-
-        public Task RunAsync(IServiceProvider factory, CancellationToken cancellationToken)
+        public Task RunAsync(CancellationToken cancellationToken)
         {
             Assert.AreEqual(Args[1], _config.StringValue);
             Assert.AreEqual(Int32.Parse(Args[3]), _config.Int32Value);

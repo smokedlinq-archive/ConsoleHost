@@ -1,7 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -11,7 +13,18 @@ namespace Tests
     public class ConsoleHostTests
     {
         [TestMethod]
-        public void SimpleMockConsoleApp_ShouldBe_Sucessful()
+        [ExpectedException(typeof(AggregateException))]
+        public void MockConsoleAppThatThrowsAnException_ShouldNotBe_Successful()
+        {
+            ConsoleHost
+                .CreateBuilder(new string[0])
+                .UseApp<MockConsoleAppThatThrowsAnInvalidOperationException>()
+                .Build()
+                .Run();
+        }
+
+        [TestMethod]
+        public void MockConsoleApp_ShouldBe_Sucessful()
         {
             ConsoleHost
                 .CreateBuilder(new string[0])
@@ -37,7 +50,7 @@ namespace Tests
         }
 
         [TestMethod]
-        public void ConsoleHostShouldRunImplicitMockConsoleApp()
+        public void ImplicitlyConfiguredMockConsoleApp_ShouldBe_Successful()
         {
             ConsoleHost
                 .CreateBuilder(new string[0])
@@ -46,7 +59,18 @@ namespace Tests
         }
 
         [TestMethod]
-        public void ConsoleHostShouldRunMultipleExplicitMockConsoleApp()
+        [ExpectedException(typeof(InvalidOperationException))]
+        public void NoConsoleApp_ShouldNotBe_Successful()
+        {
+            ConsoleHost
+                .CreateBuilder(new string[0])
+                .UseSetting("CONSOLEHOSTBUILDER_EXPLICIT_CONSOLEAPP_ONLY", "true")
+                .Build()
+                .Run();
+        }
+
+        [TestMethod]
+        public void MultipleConsoleApp_ShouldBe_Successful()
         {
             ConsoleHost
                 .CreateBuilder(new string[0])
@@ -57,11 +81,11 @@ namespace Tests
         }
 
         [TestMethod]
-        public void ConsoleHostShouldRunExplicitNonPublicConsoleAppWithConfigValidationFromCommandLineArgs()
+        public void MockConsoleAppThatValidatesMockConsoleAppConfigFromCommandLine_ShouldBe_Successful()
         {
             ConsoleHost
-                .CreateBuilder(MockConsoleAppThatValidatesMockConsoleAppConfig.Args)
-                .UseApp<MockConsoleAppThatValidatesMockConsoleAppConfig>()
+                .CreateBuilder(MockConsoleAppThatValidatesMockConsoleAppConfigFromCommandLine.Args)
+                .UseApp<MockConsoleAppThatValidatesMockConsoleAppConfigFromCommandLine>()
                 .Build()
                 .Run();
         }

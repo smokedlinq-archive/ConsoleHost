@@ -30,6 +30,15 @@ namespace System
             return builder;
         }
 
+        public static ConsoleHostBuilder AddCommandLine<T>(this ConsoleHostBuilder builder, IDictionary<string, string> switchMappings)
+            where T : class
+        {
+            if (builder == null)
+                throw new ArgumentNullException(nameof(builder));
+
+            return builder.AddCommandLine(typeof(T), switchMappings);
+        }
+
         public static ConsoleHostBuilder AddCommandLine(this ConsoleHostBuilder builder, Assembly assembly)
         {
             if (builder == null)
@@ -37,7 +46,7 @@ namespace System
             if (assembly == null)
                 throw new ArgumentNullException(nameof(assembly));
 
-            foreach (var type in assembly.GetTypes())
+            foreach (var type in assembly.GetTypes().Where(t => t.IsPublic && !t.IsAbstract))
             {
                 PropertyInfo switchMappingsProperty = null;
 

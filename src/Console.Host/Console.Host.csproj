@@ -7,9 +7,9 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <DebugType>full</DebugType>
-    <VersionPrefix>0.0.1.$(BUILD_BUILDID)</VersionPrefix>
-    <FileVersion>0.0.1.$(BUILD_BUILDID)</FileVersion>
-    <AssemblyVersion>0.0.1.$(BUILD_BUILDID)</AssemblyVersion>
+    <VersionPrefix>0.0.2.$(BUILD_BUILDID)</VersionPrefix>
+    <FileVersion>0.0.2.$(BUILD_BUILDID)</FileVersion>
+    <AssemblyVersion>0.0.2.$(BUILD_BUILDID)</AssemblyVersion>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Authors>https://github.com/smokedlinq/ConsoleHost</Authors>
     <Company>https://github.com/smokedlinq/ConsoleHost</Company>

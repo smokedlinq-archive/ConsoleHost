@@ -14,11 +14,10 @@ namespace System
     {
         private readonly string[] _args;
         private readonly IConfiguration _config;
-        private readonly Assembly _configuringAssembly;
-        private readonly List<Action<IConfigurationBuilder>> _configureAppConfigurationDelegates = new List<Action<IConfigurationBuilder>>();
-        private readonly List<Action<ILoggerFactory>> _configureLoggingDelegates = new List<Action<ILoggerFactory>>();
-        private readonly List<Action<IServiceCollection>> _configureServicesDelegates = new List<Action<IServiceCollection>>();
-
+        private readonly ConsoleHostAppConfigurationBuilder _appConfigurationBuilder = new ConsoleHostAppConfigurationBuilder();
+        private readonly ConsoleHostLoggingBuilder _loggingBuilder = new ConsoleHostLoggingBuilder();
+        private readonly ConsoleHostServiceProviderBuilder _servicesBuilder = new ConsoleHostServiceProviderBuilder();
+        
         public ConsoleHostBuilder(string[] args = null)
         {
             _args = args ?? new string[0];
@@ -27,9 +26,25 @@ namespace System
                         .AddEnvironmentVariables()
                         .Build();
 
-            _configuringAssembly = GetConfiguringAssembly();
+            _appConfigurationBuilder.Add(builder => builder.AddInMemoryCollection(_config.AsEnumerable()));
 
-            this.AddCommandLine(_configuringAssembly);
+            var configuringAssembly =
+                new StackTrace()
+                    .GetFrames()
+                    .First(frame => frame.GetMethod().ReflectedType.Assembly != typeof(ConsoleHostBuilder).Assembly)
+                    .GetMethod()
+                    .ReflectedType
+                    .Assembly;
+
+            _servicesBuilder.Add(services =>
+            {
+                if (string.IsNullOrEmpty(this.GetSetting("CONSOLEHOSTBUILDER_EXPLICIT_CONSOLEAPP_ONLY")))
+                    services.AddConsoleAppFrom(configuringAssembly);
+
+                services.ConfigureServicesFrom(configuringAssembly);
+            });
+
+            this.AddCommandLine(configuringAssembly);
         }
 
         public ConsoleHostBuilder AddCommandLine(Type type, IDictionary<string, string> switchMappings)
@@ -41,16 +56,13 @@ namespace System
 
             ConfigureAppConfiguration(config => config.AddCommandLine(_args, switchMappings));
             ConfigureServices(services => services.AddTransient(type));
+
             return this;
         }
 
-        public ConsoleHostBuilder AddCommandLine<T>(IDictionary<string, string> switchMappings)
-            where T : class
-            => AddCommandLine(typeof(T), switchMappings);
-
         public ConsoleHostBuilder ConfigureAppConfiguration(Action<IConfigurationBuilder> configure)
         {
-            _configureAppConfigurationDelegates.Add(configure ?? throw new ArgumentNullException(nameof(configure)));
+            _appConfigurationBuilder.Add(configure ?? throw new ArgumentNullException(nameof(configure)));
             return this;
         }
 
@@ -69,98 +81,23 @@ namespace System
 
         public ConsoleHostBuilder ConfigureLogging(Action<ILoggerFactory> configure)
         {
-            _configureLoggingDelegates.Add(configure ?? throw new ArgumentNullException(nameof(configure)));
+            _loggingBuilder.Add(configure ?? throw new ArgumentNullException(nameof(configure)));
             return this;
         }
 
         public ConsoleHostBuilder ConfigureServices(Action<IServiceCollection> configure)
         {
-            _configureServicesDelegates.Add(configure ?? throw new ArgumentNullException(nameof(configure)));
+            _servicesBuilder.Add(configure ?? throw new ArgumentNullException(nameof(configure)));
             return this;
         }
 
         public ConsoleHost Build()
         {
-            var config = BuildConfiguration();
-            var services = ConfigureServices(config);
+            var config = _appConfigurationBuilder.Build(_config);
+            var services = _servicesBuilder.Build(config);
+            var logging = _loggingBuilder.Build(services);
 
-            EnsureConsoleApp(services);
-
-            var hostProvider = services.BuildServiceProvider();
-
-            ConfigureLogging(hostProvider);
-            
-            IServiceCollection appServices = new ServiceCollection();
-            foreach (var service in services)
-                appServices.Add(service);
-            
-            return new ConsoleHost(appServices, hostProvider);
+            return new ConsoleHost(services, logging.CreateLogger<ConsoleHost>());
         }
-
-        private IConfiguration BuildConfiguration()
-        {
-            var builder = new ConfigurationBuilder()
-                            .AddInMemoryCollection(_config.AsEnumerable());
-            
-            foreach (var configure in _configureAppConfigurationDelegates)
-                configure(builder);
-
-            return builder.Build();
-        }
-
-        private IServiceCollection ConfigureServices(IConfiguration config)
-        {
-            Debug.Assert(config != null);
-
-            var services = new ServiceCollection();
-
-            services.AddOptions();
-            services.AddLogging();
-            services.AddSingleton<IConfiguration>(config);
-
-            foreach (var configure in _configureServicesDelegates)
-                configure(services);
-
-            return services;
-        }
-
-        private void EnsureConsoleApp(IServiceCollection services)
-        {
-            Debug.Assert(services != null);
-
-            if (!services.Any(service => service.ServiceType == typeof(IConsoleApp)))
-            {
-                foreach (var type in _configuringAssembly.GetTypes().Where(t => t.IsPublic && !t.IsAbstract && typeof(IConsoleApp).IsAssignableFrom(t)))
-                    services.AddTransient(typeof(IConsoleApp), type);
-
-                if (!services.Any(service => service.ServiceType == typeof(IConsoleApp)))
-                    throw new InvalidOperationException($"The ConsoleHostBuilder could not find a type that implements IConsoleApp; add a public class that implements IConsoleApp to the assembly '{_configuringAssembly.FullName}' or explicitly call UseApp<T>() to specify the type to use.");
-            }
-        }
-
-        private void ConfigureLogging(IServiceProvider provider)
-        {
-            Debug.Assert(provider != null);
-
-            var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
-
-            if (_configureLoggingDelegates.Count == 0)
-            {
-                loggerFactory.AddConsole();
-            }
-            else
-            {
-                foreach (var configure in _configureLoggingDelegates)
-                    configure(loggerFactory);
-            }
-        }
-
-        private static Assembly GetConfiguringAssembly()
-            => new StackTrace()
-                .GetFrames()
-                .First(frame => frame.GetMethod().ReflectedType.Assembly != typeof(ConsoleHostBuilder).Assembly)
-                .GetMethod()
-                .ReflectedType
-                .Assembly;
     }
 }

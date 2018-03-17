@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,13 +11,13 @@ namespace System
 {
     public class ConsoleHost
     {
-        private readonly IServiceCollection _appServiceCollection;
-        private readonly IServiceProvider _hostServices;
+        private readonly IServiceProvider _services;
+        private readonly ILogger<ConsoleHost> _logger;
 
-        public ConsoleHost(IServiceCollection appServiceCollection, IServiceProvider hostServices)
+        public ConsoleHost(IServiceProvider services, ILogger<ConsoleHost> logger)
         {
-            _appServiceCollection = appServiceCollection ?? throw new ArgumentNullException(nameof(appServiceCollection));
-            _hostServices = hostServices ?? throw new ArgumentNullException(nameof(hostServices));
+            _services = services ?? throw new ArgumentNullException(nameof(services));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public static ConsoleHostBuilder CreateBuilder(string[] args)
@@ -26,12 +27,12 @@ namespace System
 
         public void Run()
         {
-            var apps = _hostServices.GetServices<IConsoleApp>();
+            var apps = _services.GetServices<IConsoleApp>();
+            
+            if (!apps.Any())
+                throw new InvalidOperationException($"No service for type '{typeof(IConsoleApp)}' has been registered.");
 
-            foreach(var app in apps)
-                app.ConfigureServices(_appServiceCollection);
-
-            var services = _appServiceCollection.BuildServiceProvider();
+            var tasks = new List<Task>(apps.Count());
             var cts = new CancellationTokenSource();
 
             Console.CancelKeyPress += (sender, e) =>
@@ -42,21 +43,37 @@ namespace System
 
             try
             {
-                var tasks = new List<Task>(apps.Count());
-
                 foreach (var app in apps)
-                    tasks.Add(app.RunAsync(services, cts.Token));
+                {
+                    _logger.LogTrace($"[{app.GetType().FullName}] Starting");
+
+                    tasks.Add(
+                        app
+                            .RunAsync(cts.Token)
+                            .ContinueWith(task =>
+                            {
+                                if (task.IsFaulted)
+                                {
+                                    _logger.LogCritical(task.Exception, $"[{app.GetType().FullName}] Failed: {task.Exception.InnerException.Message}");
+                                    throw task.Exception;
+                                }
+
+                                _logger.LogTrace($"[{app.GetType().FullName}] Completed");
+                            }, cts.Token));
+                }
 
                 Task.WhenAll(tasks).GetAwaiter().GetResult();
             }
-            catch
+            catch (Exception ex)
             {
                 cts.Cancel();
+                _logger.LogCritical(ex, ex.Message);
                 throw;
             }
             finally
             {
-                services.Dispose();
+                if (_services is IDisposable)
+                    ((IDisposable)_services).Dispose();
             }
         }
     }
