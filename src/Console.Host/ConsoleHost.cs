@@ -72,8 +72,8 @@ namespace System
             }
             finally
             {
-                if (_services is IDisposable)
-                    ((IDisposable)_services).Dispose();
+                if (_services is IDisposable dispoable)
+                    dispoable.Dispose();
             }
         }
     }
