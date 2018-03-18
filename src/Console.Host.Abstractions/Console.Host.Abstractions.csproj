@@ -1,23 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup Condition="'$(BUILD_BUILDID)' == ''">
-    <BUILD_BUILDID>0</BUILD_BUILDID>
-  </PropertyGroup>
-  
+  <Import Project="..\..\ConsoleHost.targets" />
+
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <DebugType>full</DebugType>
-    <VersionPrefix>0.0.2.$(BUILD_BUILDID)</VersionPrefix>
-    <FileVersion>0.0.2.$(BUILD_BUILDID)</FileVersion>
-    <AssemblyVersion>0.0.2.$(BUILD_BUILDID)</AssemblyVersion>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Authors>https://github.com/smokedlinq/ConsoleHost</Authors>
-    <Company>https://github.com/smokedlinq/ConsoleHost</Company>
-    <Description>ConsoleHost library makes writing simple and testable .NET console apps easier.</Description>
-    <PackageProjectUrl>https://github.com/smokedlinq/ConsoleHost</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/smokedlinq/ConsoleHost.git</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
     <RootNamespace>System</RootNamespace>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>

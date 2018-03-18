@@ -32,7 +32,23 @@ namespace System
             foreach (var configure in _delegates)
                 configure(services);
 
-            return services.BuildServiceProvider();
+            return GetProviderFromFactory(services);
+        }
+
+        private IServiceProvider GetProviderFromFactory(IServiceCollection collection)
+        {
+            var provider = collection.BuildServiceProvider();
+            var factory = provider.GetService<IServiceProviderFactory<IServiceCollection>>();
+
+            if (factory != null)
+            {
+                using (provider)
+                {
+                    return factory.CreateServiceProvider(factory.CreateBuilder(collection));
+                }
+            }
+
+            return provider;
         }
     }
 }

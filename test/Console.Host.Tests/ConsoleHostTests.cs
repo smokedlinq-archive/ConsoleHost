@@ -24,6 +24,16 @@ namespace Tests
         }
 
         [TestMethod]
+        public void MockConsoleApp_ConfiguredWithExplicitServiceProviderFactory_ShouldBe_Sucessful()
+        {
+            ConsoleHost
+                .CreateBuilder(new string[0])
+                .ConfigureServices(container => container.AddSingleton<IServiceProviderFactory<IServiceCollection>>(_ => new DefaultServiceProviderFactory()))
+                .Build()
+                .Run();
+        }
+
+        [TestMethod]
         public void MockConsoleApp_ShouldBe_Sucessful()
         {
             ConsoleHost
@@ -38,12 +48,12 @@ namespace Tests
         {
             ConsoleHost
                 .CreateBuilder(new string[0])
-                .UseSetting("SETTING", "VALUE")
                 .AddCommandLine<MockConsoleAppConfig>(MockConsoleAppConfig.SwitchMappings)
-                .Configure(x => { x.GetSetting("SETTING"); })
+                .Configure(x => { })
                 .ConfigureAppConfiguration(_ => { })
                 .ConfigureLogging(_ => { })
                 .ConfigureServices(_ => { })
+                .AddApp<MockConsoleApp>()
                 .UseApp<MockConsoleApp>()
                 .Build()
                 .Run();
@@ -64,7 +74,12 @@ namespace Tests
         {
             ConsoleHost
                 .CreateBuilder(new string[0])
-                .UseSetting("CONSOLEHOSTBUILDER_EXPLICIT_CONSOLEAPP_ONLY", "true")
+                .ConfigureServices(container =>
+                {
+                    var descriptors = container.Where(d => d.ServiceType == typeof(IConsoleApp)).ToArray();
+                    foreach (var descriptor in descriptors)
+                        container.Remove(descriptor);
+                })
                 .Build()
                 .Run();
         }
@@ -75,7 +90,7 @@ namespace Tests
             ConsoleHost
                 .CreateBuilder(new string[0])
                 .UseApp<MockConsoleApp>()
-                .UseApp<MockConsoleApp>()
+                .AddApp<MockConsoleApp>()
                 .Build()
                 .Run();
         }
@@ -88,6 +103,26 @@ namespace Tests
                 .UseApp<MockConsoleAppThatValidatesMockConsoleAppConfigFromCommandLine>()
                 .Build()
                 .Run();
+        }
+
+        [TestMethod]
+        public void MockConsoleAppThatWaitsForCancellation_ShouldBe_Successful()
+        {
+            var cts = new CancellationTokenSource();
+
+            var host =
+                ConsoleHost
+                    .CreateBuilder(MockConsoleAppThatValidatesMockConsoleAppConfigFromCommandLine.Args)
+                    .UseApp<MockConsoleAppThatWaitsForCancellation>()
+                    .Build();
+
+            var task = Task.Run(() => host.Run(cts.Token));
+
+            cts.Cancel();
+
+            Task.WaitAny(task, Task.Delay(1000));
+
+            Assert.AreEqual(true, task.IsCompleted);
         }
     }
 }

@@ -9,11 +9,11 @@ using System.Threading.Tasks;
 
 namespace System
 {
-    public class ConsoleHost
+    public sealed class ConsoleHost : IConsoleHost
     {
         private readonly IServiceProvider _services;
         private readonly ILogger<ConsoleHost> _logger;
-
+        
         public ConsoleHost(IServiceProvider services, ILogger<ConsoleHost> logger)
         {
             _services = services ?? throw new ArgumentNullException(nameof(services));
@@ -21,19 +21,17 @@ namespace System
         }
 
         public static ConsoleHostBuilder CreateBuilder(string[] args)
-        {
-            return new ConsoleHostBuilder(args);
-        }
+            => new ConsoleHostBuilder(args);
 
-        public void Run()
+        public void Run(CancellationToken cancellationToken = default)
         {
             var apps = _services.GetServices<IConsoleApp>();
-            
+            var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+
             if (!apps.Any())
                 throw new InvalidOperationException($"No service for type '{typeof(IConsoleApp)}' has been registered.");
 
             var tasks = new List<Task>(apps.Count());
-            var cts = new CancellationTokenSource();
 
             Console.CancelKeyPress += (sender, e) =>
             {
@@ -63,6 +61,10 @@ namespace System
                 }
 
                 Task.WhenAll(tasks).GetAwaiter().GetResult();
+            }
+            catch (TaskCanceledException)
+            {
+                // NOOP
             }
             catch (Exception ex)
             {

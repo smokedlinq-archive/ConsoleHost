@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,18 +10,33 @@ namespace System
 {
     public static class ConsoleHostBuilderExtensions
     {
-        public static ConsoleHostBuilder UseApp<T>(this ConsoleHostBuilder builder)
+        public static IConsoleHostBuilder UseApp<T>(this IConsoleHostBuilder builder)
             where T : class, IConsoleApp
         {
             if (builder == null)
                 throw new ArgumentNullException(nameof(builder));
             
-            builder.ConfigureServices(services => services.AddTransient<IConsoleApp, T>());
+            return builder.ConfigureServices(services =>
+            {
+                var descriptors = services.Where(d => d.ServiceType == typeof(IConsoleApp)).ToArray();
 
-            return builder;
+                foreach (var descriptor in descriptors)
+                    services.Remove(descriptor);
+
+                services.AddTransient<IConsoleApp, T>();
+            });
         }
 
-        public static ConsoleHostBuilder Configure(this ConsoleHostBuilder builder, Action<ConsoleHostBuilder> configure)
+        public static IConsoleHostBuilder AddApp<T>(this IConsoleHostBuilder builder)
+            where T : class, IConsoleApp
+        {
+            if (builder == null)
+                throw new ArgumentNullException(nameof(builder));
+
+            return builder.ConfigureServices(services => services.AddTransient<IConsoleApp, T>());
+        }
+
+        public static IConsoleHostBuilder Configure(this IConsoleHostBuilder builder, Action<IConsoleHostBuilder> configure)
         {
             if (builder == null)
                 throw new ArgumentNullException(nameof(builder));
@@ -30,7 +46,21 @@ namespace System
             return builder;
         }
 
-        public static ConsoleHostBuilder AddCommandLine<T>(this ConsoleHostBuilder builder, IDictionary<string, string> switchMappings)
+        public static IConsoleHostBuilder AddCommandLine(this IConsoleHostBuilder builder, Type type, IDictionary<string, string> switchMappings)
+        {
+            if (builder == null)
+                throw new ArgumentNullException(nameof(builder));
+            if (type == null)
+                throw new ArgumentNullException(nameof(type));
+            if (switchMappings == null)
+                throw new ArgumentNullException(nameof(switchMappings));
+
+            return builder
+                    .ConfigureCommandLine(() => switchMappings)
+                    .ConfigureServices(services => services.AddTransient(type));
+        }
+
+        public static IConsoleHostBuilder AddCommandLine<T>(this IConsoleHostBuilder builder, IDictionary<string, string> switchMappings)
             where T : class
         {
             if (builder == null)
@@ -39,7 +69,7 @@ namespace System
             return builder.AddCommandLine(typeof(T), switchMappings);
         }
 
-        public static ConsoleHostBuilder AddCommandLine(this ConsoleHostBuilder builder, Assembly assembly)
+        public static IConsoleHostBuilder AddCommandLine(this IConsoleHostBuilder builder, Assembly assembly)
         {
             if (builder == null)
                 throw new ArgumentNullException(nameof(builder));

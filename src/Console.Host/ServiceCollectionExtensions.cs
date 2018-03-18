@@ -26,8 +26,8 @@ namespace System
             Debug.Assert(services != null);
             Debug.Assert(assembly != null);
 
-            foreach (var type in assembly.GetTypes().Where(t => t.IsPublic && !t.IsAbstract && typeof(IConfigureServices).IsAssignableFrom(t)))
-                ((IConfigureServices)Activator.CreateInstance(type)).Configure(services);
+            foreach (var type in assembly.GetTypes().Where(t => t.IsPublic && !t.IsAbstract && typeof(IConfigureConsoleHostServices).IsAssignableFrom(t)))
+                ((IConfigureConsoleHostServices)Activator.CreateInstance(type)).Configure(services);
 
             return services;
         }

@@ -85,7 +85,7 @@ static class Program
     {
         ConsoleHost
             .CreateBuilder(args)
-			.ConfigureServices(container => container.AddTransient<MyService>())
+            .ConfigureServices(container => container.AddTransient<MyService>())
             .Build()
             .Run()
     }
@@ -144,8 +144,8 @@ static class Program
     {
         ConsoleHost
             .CreateBuilder(args)
-			.ConfigureServices(container => container.AddTransient<MyService>())
-			.ConfigureLogging(logging => logging.AddConsole().AddDebug())
+            .ConfigureServices(container => container.AddTransient<MyService>())
+            .ConfigureLogging(logging => logging.AddConsole().AddDebug())
             .Build()
             .Run()
     }

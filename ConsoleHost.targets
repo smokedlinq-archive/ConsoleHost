@@ -1,0 +1,21 @@
+<Project>
+  <PropertyGroup Condition="'$(BUILD_BUILDID)' == ''">
+    <BUILD_BUILDID>0</BUILD_BUILDID>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <BUILD_VERSION>0.0.3.$(BUILD_BUILDID)</BUILD_VERSION>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <VersionPrefix>$(BUILD_VERSION)</VersionPrefix>
+    <FileVersion>$(BUILD_VERSION)</FileVersion>
+    <AssemblyVersion>$(BUILD_VERSION)</AssemblyVersion>
+    <Authors>https://github.com/smokedlinq/ConsoleHost</Authors>
+    <Company>https://github.com/smokedlinq/ConsoleHost</Company>
+    <Description>ConsoleHost library makes writing simple and testable .NET console apps easier.</Description>
+    <PackageProjectUrl>https://github.com/smokedlinq/ConsoleHost</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/smokedlinq/ConsoleHost.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+  </PropertyGroup>
+ </Project>

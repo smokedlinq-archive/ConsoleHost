@@ -7,17 +7,18 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 
 namespace System
 {
-    public class ConsoleHostBuilder
+    public sealed class ConsoleHostBuilder : IConsoleHostBuilder
     {
         private readonly string[] _args;
         private readonly IConfiguration _config;
         private readonly ConsoleHostAppConfigurationBuilder _appConfigurationBuilder = new ConsoleHostAppConfigurationBuilder();
         private readonly ConsoleHostLoggingBuilder _loggingBuilder = new ConsoleHostLoggingBuilder();
         private readonly ConsoleHostServiceProviderBuilder _servicesBuilder = new ConsoleHostServiceProviderBuilder();
-        
+
         public ConsoleHostBuilder(string[] args = null)
         {
             _args = args ?? new string[0];
@@ -25,7 +26,7 @@ namespace System
                         .AddCommandLine(args)
                         .AddEnvironmentVariables()
                         .Build();
-
+            
             _appConfigurationBuilder.Add(builder => builder.AddInMemoryCollection(_config.AsEnumerable()));
 
             var configuringAssembly =
@@ -38,60 +39,40 @@ namespace System
 
             _servicesBuilder.Add(services =>
             {
-                if (string.IsNullOrEmpty(this.GetSetting("CONSOLEHOSTBUILDER_EXPLICIT_CONSOLEAPP_ONLY")))
-                    services.AddConsoleAppFrom(configuringAssembly);
-
+                services.AddConsoleAppFrom(configuringAssembly);
                 services.ConfigureServicesFrom(configuringAssembly);
             });
 
             this.AddCommandLine(configuringAssembly);
         }
 
-        public ConsoleHostBuilder AddCommandLine(Type type, IDictionary<string, string> switchMappings)
+        public IConsoleHostBuilder ConfigureCommandLine(Func<IDictionary<string, string>> configure)
         {
-            if (type == null)
-                throw new ArgumentNullException(nameof(type));
-            if (switchMappings == null)
-                throw new ArgumentNullException(nameof(switchMappings));
-
-            ConfigureAppConfiguration(config => config.AddCommandLine(_args, switchMappings));
-            ConfigureServices(services => services.AddTransient(type));
-
+            if (configure == null)
+                throw new ArgumentNullException(nameof(configure));
+            _appConfigurationBuilder.Add(container => container.AddCommandLine(_args, configure()));
             return this;
         }
 
-        public ConsoleHostBuilder ConfigureAppConfiguration(Action<IConfigurationBuilder> configure)
+        public IConsoleHostBuilder ConfigureAppConfiguration(Action<IConfigurationBuilder> configure)
         {
             _appConfigurationBuilder.Add(configure ?? throw new ArgumentNullException(nameof(configure)));
             return this;
         }
 
-        public ConsoleHostBuilder UseSetting(string key, string value)
-        {
-            if (string.IsNullOrEmpty(key))
-                throw new ArgumentNullException(nameof(key));
-
-            _config[key] = value;
-
-            return this;
-        }
-
-        public string GetSetting(string key)
-            => _config[key];
-
-        public ConsoleHostBuilder ConfigureLogging(Action<ILoggerFactory> configure)
+        public IConsoleHostBuilder ConfigureLogging(Action<ILoggerFactory> configure)
         {
             _loggingBuilder.Add(configure ?? throw new ArgumentNullException(nameof(configure)));
             return this;
         }
 
-        public ConsoleHostBuilder ConfigureServices(Action<IServiceCollection> configure)
+        public IConsoleHostBuilder ConfigureServices(Action<IServiceCollection> configure)
         {
             _servicesBuilder.Add(configure ?? throw new ArgumentNullException(nameof(configure)));
             return this;
         }
 
-        public ConsoleHost Build()
+        public IConsoleHost Build()
         {
             var config = _appConfigurationBuilder.Build(_config);
             var services = _servicesBuilder.Build(config);

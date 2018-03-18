@@ -8,9 +8,12 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Tests
 {
-    public class MockConsoleApp : IConsoleApp
+    internal class MockConsoleAppThatWaitsForCancellation : IConsoleApp
     {
         public Task RunAsync(CancellationToken cancellationToken)
-            => Task.CompletedTask;
+        {
+            cancellationToken.WaitHandle.WaitOne();
+            return Task.CompletedTask;
+        }
     }
 }

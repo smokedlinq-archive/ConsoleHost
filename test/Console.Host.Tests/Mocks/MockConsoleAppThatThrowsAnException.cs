@@ -10,9 +10,7 @@ namespace Tests
 {
     internal class MockConsoleAppThatThrowsAnInvalidOperationException : IConsoleApp
     {
-        public Task RunAsync(CancellationToken cancellationToken)
-        {
-            return Task.Run(() => throw new InvalidOperationException());
-        }
+        public Task RunAsync(CancellationToken cancellationToken) 
+            => Task.Run(() => throw new InvalidOperationException());
     }
 }
