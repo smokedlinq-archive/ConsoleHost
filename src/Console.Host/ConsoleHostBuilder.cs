@@ -37,13 +37,13 @@ namespace System
                     .ReflectedType
                     .Assembly;
 
+            this.AddCommandLine(configuringAssembly);
+
             _servicesBuilder.Add(services =>
             {
                 services.AddConsoleAppFrom(configuringAssembly);
                 services.ConfigureServicesFrom(configuringAssembly);
             });
-
-            this.AddCommandLine(configuringAssembly);
         }
 
         public IConsoleHostBuilder ConfigureCommandLine(Func<IDictionary<string, string>> configure)
