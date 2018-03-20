@@ -26,11 +26,11 @@ namespace System
             Debug.Assert(container != null);
             Debug.Assert(assembly != null);
 
-            foreach (var type in assembly.GetTypes().Where(t => t.IsPublic && !t.IsAbstract && typeof(IConsoleHostServices).IsAssignableFrom(t)))
-                container.AddTransient(typeof(IConsoleHostServices), type);
+            foreach (var type in assembly.GetTypes().Where(t => t.IsPublic && !t.IsAbstract && typeof(IConfigureConsoleHostServices).IsAssignableFrom(t)))
+                container.AddTransient(typeof(IConfigureConsoleHostServices), type);
 
             using (var provider = container.BuildServiceProvider())
-                foreach (var service in provider.GetServices<IConsoleHostServices>())
+                foreach (var service in provider.GetServices<IConfigureConsoleHostServices>())
                     service.Configure(container);
 
             return container;

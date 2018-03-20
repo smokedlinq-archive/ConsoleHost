@@ -7,7 +7,7 @@
     <DebugType>full</DebugType>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageId>Console.Host.ApplicationInsights</PackageId>
-    <RootNamespace>System</RootNamespace>
+    <RootNamespace>Microsoft.ApplicationInsights</RootNamespace>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
 

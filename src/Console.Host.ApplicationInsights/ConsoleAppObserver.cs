@@ -2,6 +2,8 @@
 using Microsoft.ApplicationInsights.Extensibility;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 
 namespace Microsoft.ApplicationInsights
 {
@@ -19,6 +21,8 @@ namespace Microsoft.ApplicationInsights
                 item.Value.Dispose();
 
             _operations.Clear();
+
+            _telemetryClient.Flush();
         }
 
         public void OnCompleted(IConsoleApp app)
@@ -40,6 +44,9 @@ namespace Microsoft.ApplicationInsights
             operation.Telemetry.Type = "Console";
             operation.Telemetry.Data = $"Run {value.GetType().AssemblyQualifiedName}";
 
+            if (value is IWantOperationTelemetry<DependencyTelemetry> holder)
+                holder.Telemetry = operation.Telemetry;
+            
             _operations.Add(value, operation);
         }
     }

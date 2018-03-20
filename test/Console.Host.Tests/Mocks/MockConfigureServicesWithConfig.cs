@@ -7,7 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Tests
 {
-    public class MockConfigureServicesWithConfig : IConsoleHostServices
+    public class MockConfigureServicesWithConfig : IConfigureConsoleHostServices
     {
         public MockConfigureServicesWithConfig(MockConsoleAppConfig config)
         {

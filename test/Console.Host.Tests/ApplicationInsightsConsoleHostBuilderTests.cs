@@ -102,5 +102,16 @@ namespace Tests
                     .Build()
                     .Run();
         }
+
+        [TestMethod]
+        public void MockConsoleAppThatWantsOperationTelemetry_ShouldBe_Successful()
+        {
+            ConsoleHost
+                .CreateBuilder(new string[0])
+                .UseApplicationInsights(InstrumentationKey)
+                .UseApp<MockConsoleAppThatWantsOperationTelemetry>(replace: true)
+                .Build()
+                .Run();
+        }
     }
 }

@@ -52,13 +52,8 @@ namespace System
                                 .ContinueWith(task =>
                                 {
                                     if (task.IsFaulted)
-                                    {
                                         observers.Exception(app, task.Exception);
-                                        throw task.Exception;
-                                    }
-                                }, cts.Token)
-                                .ContinueWith(task =>
-                                {
+
                                     observers.Complete(app);
 
                                     if (task.IsFaulted)
