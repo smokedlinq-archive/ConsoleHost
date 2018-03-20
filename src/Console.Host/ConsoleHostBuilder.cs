@@ -16,7 +16,7 @@ namespace System
         private readonly string[] _args;
         private readonly IConfiguration _config;
         private readonly ConsoleHostAppConfigurationBuilder _appConfigurationBuilder = new ConsoleHostAppConfigurationBuilder();
-        private readonly ConsoleHostLoggingBuilder _loggingBuilder = new ConsoleHostLoggingBuilder();
+        private readonly ConsoleHostLoggerFactoryBuilder _loggerBuilder = new ConsoleHostLoggerFactoryBuilder();
         private readonly ConsoleHostServiceProviderBuilder _servicesBuilder = new ConsoleHostServiceProviderBuilder();
 
         public ConsoleHostBuilder(string[] args = null)
@@ -37,12 +37,12 @@ namespace System
                     .ReflectedType
                     .Assembly;
 
-            this.AddCommandLine(configuringAssembly);
+            this.ConfigureCommandLine(configuringAssembly);
 
-            _servicesBuilder.Add(services =>
+            _servicesBuilder.Add((_, container) =>
             {
-                services.AddConsoleAppFrom(configuringAssembly);
-                services.ConfigureServicesFrom(configuringAssembly);
+                container.AddTransientFrom<IConsoleApp>(configuringAssembly);
+                container.ConfigureFrom(configuringAssembly);
             });
         }
 
@@ -60,13 +60,13 @@ namespace System
             return this;
         }
 
-        public IConsoleHostBuilder ConfigureLogging(Action<ILoggerFactory> configure)
+        public IConsoleHostBuilder ConfigureLogging(Action<IServiceProvider, ILoggerFactory> configure)
         {
-            _loggingBuilder.Add(configure ?? throw new ArgumentNullException(nameof(configure)));
+            _loggerBuilder.Add(configure ?? throw new ArgumentNullException(nameof(configure)));
             return this;
         }
 
-        public IConsoleHostBuilder ConfigureServices(Action<IServiceCollection> configure)
+        public IConsoleHostBuilder ConfigureServices(Action<IConfiguration, IServiceCollection> configure)
         {
             _servicesBuilder.Add(configure ?? throw new ArgumentNullException(nameof(configure)));
             return this;
@@ -76,9 +76,9 @@ namespace System
         {
             var config = _appConfigurationBuilder.Build(_config);
             var services = _servicesBuilder.Build(config);
-            var logging = _loggingBuilder.Build(services);
+            var logger = _loggerBuilder.Build(services);
 
-            return new ConsoleHost(services, logging.CreateLogger<ConsoleHost>());
+            return new ConsoleHost(services, logger.CreateLogger<ConsoleHost>());
         }
     }
 }

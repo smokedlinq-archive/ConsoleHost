@@ -10,30 +10,48 @@ namespace System
 {
     internal static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddConsoleAppFrom(this IServiceCollection services, Assembly assembly)
+        public static IServiceCollection AddTransientFrom<T>(this IServiceCollection container, Assembly assembly)
         {
-            Debug.Assert(services != null);
+            Debug.Assert(container != null);
             Debug.Assert(assembly != null);
 
-            foreach (var type in assembly.GetTypes().Where(t => t.IsPublic && !t.IsAbstract && typeof(IConsoleApp).IsAssignableFrom(t)))
-                services.AddTransient(typeof(IConsoleApp), type);
+            foreach (var type in assembly.GetTypes().Where(t => t.IsPublic && !t.IsAbstract && typeof(T).IsAssignableFrom(t)))
+                container.AddTransient(typeof(T), type);
 
-            return services;
+            return container;
         }
 
-        public static IServiceCollection ConfigureServicesFrom(this IServiceCollection services, Assembly assembly)
+        public static IServiceCollection ConfigureFrom(this IServiceCollection container, Assembly assembly)
         {
-            Debug.Assert(services != null);
+            Debug.Assert(container != null);
             Debug.Assert(assembly != null);
 
-            foreach (var type in assembly.GetTypes().Where(t => t.IsPublic && !t.IsAbstract && typeof(IConfigureConsoleHostServices).IsAssignableFrom(t)))
-                services.AddTransient(typeof(IConfigureConsoleHostServices), type);
+            foreach (var type in assembly.GetTypes().Where(t => t.IsPublic && !t.IsAbstract && typeof(IConsoleHostServices).IsAssignableFrom(t)))
+                container.AddTransient(typeof(IConsoleHostServices), type);
 
-            using (var provider = services.BuildServiceProvider())
-                foreach(var service in provider.GetServices<IConfigureConsoleHostServices>())
-                    service.Configure(services);
+            using (var provider = container.BuildServiceProvider())
+                foreach (var service in provider.GetServices<IConsoleHostServices>())
+                    service.Configure(container);
 
-            return services;
+            return container;
+        }
+
+        public static IServiceProvider GetProviderFromFactory(this IServiceCollection container)
+        {
+            Debug.Assert(container != null);
+
+            var provider = container.BuildServiceProvider();
+            var factory = provider.GetService<IServiceProviderFactory<IServiceCollection>>();
+
+            if (factory != null)
+            {
+                using (provider)
+                {
+                    return factory.CreateServiceProvider(factory.CreateBuilder(container));
+                }
+            }
+
+            return provider;
         }
     }
 }

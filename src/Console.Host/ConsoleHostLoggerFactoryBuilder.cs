@@ -8,11 +8,11 @@ using System.Text;
 
 namespace System
 {
-    internal class ConsoleHostLoggingBuilder
+    internal class ConsoleHostLoggerFactoryBuilder
     {
-        private readonly List<Action<ILoggerFactory>> _delegates = new List<Action<ILoggerFactory>>();
+        private readonly List<Action<IServiceProvider, ILoggerFactory>> _delegates = new List<Action<IServiceProvider, ILoggerFactory>>();
 
-        public void Add(Action<ILoggerFactory> configure)
+        public void Add(Action<IServiceProvider, ILoggerFactory> configure)
         {
             Debug.Assert(configure != null);
             _delegates.Add(configure);
@@ -31,7 +31,7 @@ namespace System
             else
             {
                 foreach (var configure in _delegates)
-                    configure(loggerFactory);
+                    configure(services, loggerFactory);
             }
 
             return loggerFactory;

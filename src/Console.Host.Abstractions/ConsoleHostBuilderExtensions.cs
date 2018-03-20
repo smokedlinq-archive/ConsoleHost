@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,30 +11,23 @@ namespace System
 {
     public static class ConsoleHostBuilderExtensions
     {
-        public static IConsoleHostBuilder UseApp<T>(this IConsoleHostBuilder builder)
-            where T : class, IConsoleApp
-        {
-            if (builder == null)
-                throw new ArgumentNullException(nameof(builder));
-            
-            return builder.ConfigureServices(services =>
-            {
-                var descriptors = services.Where(d => d.ServiceType == typeof(IConsoleApp)).ToArray();
-
-                foreach (var descriptor in descriptors)
-                    services.Remove(descriptor);
-
-                services.AddTransient<IConsoleApp, T>();
-            });
-        }
-
-        public static IConsoleHostBuilder AddApp<T>(this IConsoleHostBuilder builder)
+        public static IConsoleHostBuilder UseApp<T>(this IConsoleHostBuilder builder, bool replace = false)
             where T : class, IConsoleApp
         {
             if (builder == null)
                 throw new ArgumentNullException(nameof(builder));
 
-            return builder.ConfigureServices(services => services.AddTransient<IConsoleApp, T>());
+            if (replace)
+            { 
+                builder.ConfigureServices(container =>
+                {
+                    var services = container.Where(service => service.ServiceType == typeof(IConsoleApp)).ToArray();
+                    foreach (var service in services)
+                        container.Remove(service);
+                });
+            }
+
+            return builder.ConfigureServices(container => container.AddTransient<IConsoleApp, T>());
         }
 
         public static IConsoleHostBuilder Configure(this IConsoleHostBuilder builder, Action<IConsoleHostBuilder> configure)
@@ -46,7 +40,27 @@ namespace System
             return builder;
         }
 
-        public static IConsoleHostBuilder AddCommandLine(this IConsoleHostBuilder builder, Type type, IDictionary<string, string> switchMappings)
+        public static IConsoleHostBuilder ConfigureServices(this IConsoleHostBuilder builder, Action<IServiceCollection> configure)
+        {
+            if (builder == null)
+                throw new ArgumentNullException(nameof(builder));
+            if (configure == null)
+                throw new ArgumentNullException(nameof(configure));
+
+            return builder.ConfigureServices((_, container) => configure(container));
+        }
+
+        public static IConsoleHostBuilder ConfigureLogging(this IConsoleHostBuilder builder, Action<ILoggerFactory> configure)
+        {
+            if (builder == null)
+                throw new ArgumentNullException(nameof(builder));
+            if (configure == null)
+                throw new ArgumentNullException(nameof(configure));
+
+            return builder.ConfigureLogging((_, loggerFactory) => configure(loggerFactory));
+        }
+
+        public static IConsoleHostBuilder ConfigureCommandLine(this IConsoleHostBuilder builder, Type type, IDictionary<string, string> switchMappings)
         {
             if (builder == null)
                 throw new ArgumentNullException(nameof(builder));
@@ -60,16 +74,16 @@ namespace System
                     .ConfigureServices(services => services.AddTransient(type));
         }
 
-        public static IConsoleHostBuilder AddCommandLine<T>(this IConsoleHostBuilder builder, IDictionary<string, string> switchMappings)
+        public static IConsoleHostBuilder ConfigureCommandLine<T>(this IConsoleHostBuilder builder, IDictionary<string, string> switchMappings)
             where T : class
         {
             if (builder == null)
                 throw new ArgumentNullException(nameof(builder));
 
-            return builder.AddCommandLine(typeof(T), switchMappings);
+            return builder.ConfigureCommandLine(typeof(T), switchMappings);
         }
 
-        public static IConsoleHostBuilder AddCommandLine(this IConsoleHostBuilder builder, Assembly assembly)
+        public static IConsoleHostBuilder ConfigureCommandLine(this IConsoleHostBuilder builder, Assembly assembly)
         {
             if (builder == null)
                 throw new ArgumentNullException(nameof(builder));
@@ -92,7 +106,7 @@ namespace System
                 if (switchMappingsProperty != null)
                 {
                     var switchMappings = (IDictionary<string, string>)switchMappingsProperty.GetValue(null);
-                    builder.AddCommandLine(type, switchMappings);
+                    builder.ConfigureCommandLine(type, switchMappings);
                 }
             }
 

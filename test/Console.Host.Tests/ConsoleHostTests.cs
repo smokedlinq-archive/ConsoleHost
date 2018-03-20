@@ -48,12 +48,12 @@ namespace Tests
         {
             ConsoleHost
                 .CreateBuilder(new string[0])
-                .AddCommandLine<MockConsoleAppConfig>(MockConsoleAppConfig.SwitchMappings)
+                .ConfigureCommandLine<MockConsoleAppConfig>(MockConsoleAppConfig.SwitchMappings)
                 .Configure(x => { })
                 .ConfigureAppConfiguration(_ => { })
                 .ConfigureLogging(_ => { })
                 .ConfigureServices(_ => { })
-                .AddApp<MockConsoleApp>()
+                .UseApp<MockConsoleApp>()
                 .UseApp<MockConsoleApp>()
                 .Build()
                 .Run();
@@ -90,7 +90,7 @@ namespace Tests
             ConsoleHost
                 .CreateBuilder(new string[0])
                 .UseApp<MockConsoleApp>()
-                .AddApp<MockConsoleApp>()
+                .UseApp<MockConsoleApp>()
                 .Build()
                 .Run();
         }

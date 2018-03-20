@@ -9,8 +9,8 @@ namespace System
     {
         IConsoleHostBuilder ConfigureCommandLine(Func<IDictionary<string, string>> configure);
         IConsoleHostBuilder ConfigureAppConfiguration(Action<IConfigurationBuilder> configure);
-        IConsoleHostBuilder ConfigureLogging(Action<ILoggerFactory> configure);
-        IConsoleHostBuilder ConfigureServices(Action<IServiceCollection> configure);
+        IConsoleHostBuilder ConfigureServices(Action<IConfiguration, IServiceCollection> configure);
+        IConsoleHostBuilder ConfigureLogging(Action<IServiceProvider, ILoggerFactory> configure);
         IConsoleHost Build();
     }
 }

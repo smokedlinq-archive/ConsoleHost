@@ -26,56 +26,63 @@ namespace System
         public void Run(CancellationToken cancellationToken = default)
         {
             var apps = _services.GetServices<IConsoleApp>();
-            var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-
+            
             if (!apps.Any())
                 throw new InvalidOperationException($"No service for type '{typeof(IConsoleApp)}' has been registered.");
 
-            var tasks = new List<Task>(apps.Count());
-
-            Console.CancelKeyPress += (sender, e) =>
+            using (var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken))
             {
-                e.Cancel = true;
-                cts.Cancel();
-            };
+                var observers = _services.GetServices<IConsoleAppObserver>();
+                var tasks = new List<Task>(apps.Count());
 
-            try
-            {
-                foreach (var app in apps)
+                Console.CancelKeyPress += (sender, e) =>
                 {
-                    _logger.LogTrace($"[{app.GetType().FullName}] Starting");
+                    e.Cancel = true;
+                    cts.Cancel();
+                };
 
-                    tasks.Add(
-                        app
-                            .RunAsync(cts.Token)
-                            .ContinueWith(task =>
-                            {
-                                if (task.IsFaulted)
+                try
+                {
+                    foreach (var app in apps)
+                    {
+                        observers.Start(app);
+
+                        tasks.Add(
+                            app.RunAsync(cts.Token)
+                                .ContinueWith(task =>
                                 {
-                                    _logger.LogCritical(task.Exception, $"[{app.GetType().FullName}] Failed: {task.Exception.InnerException.Message}");
-                                    throw task.Exception;
-                                }
+                                    if (task.IsFaulted)
+                                    {
+                                        observers.Exception(app, task.Exception);
+                                        throw task.Exception;
+                                    }
+                                }, cts.Token)
+                                .ContinueWith(task =>
+                                {
+                                    observers.Complete(app);
 
-                                _logger.LogTrace($"[{app.GetType().FullName}] Completed");
-                            }, cts.Token));
+                                    if (task.IsFaulted)
+                                        throw task.Exception;
+                                }, cts.Token));
+                    }
+
+                    Task.WhenAll(tasks).GetAwaiter().GetResult();
                 }
-
-                Task.WhenAll(tasks).GetAwaiter().GetResult();
-            }
-            catch (TaskCanceledException)
-            {
-                // NOOP
-            }
-            catch (Exception ex)
-            {
-                cts.Cancel();
-                _logger.LogCritical(ex, ex.Message);
-                throw;
-            }
-            finally
-            {
-                if (_services is IDisposable dispoable)
-                    dispoable.Dispose();
+                catch (TaskCanceledException)
+                {
+                    // NOOP
+                }
+                catch (Exception ex)
+                {
+                    cts.Cancel();
+                    _logger.LogCritical(ex, ex.Message);
+                    throw;
+                }
+                finally
+                {
+                    if (_services is IDisposable dispoable)
+                        dispoable.Dispose();
+                }
             }
         }
     }

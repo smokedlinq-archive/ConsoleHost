@@ -5,7 +5,7 @@ using System.Text;
 
 namespace System
 {
-    public interface IConfigureConsoleHostServices
+    public interface IConsoleHostServices
     {
         void Configure(IServiceCollection container);
     }

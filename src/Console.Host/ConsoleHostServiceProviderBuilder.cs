@@ -11,9 +11,9 @@ namespace System
 {
     internal class ConsoleHostServiceProviderBuilder
     {
-        private readonly List<Action<IServiceCollection>> _delegates = new List<Action<IServiceCollection>>();
+        private readonly List<Action<IConfiguration, IServiceCollection>> _delegates = new List<Action<IConfiguration, IServiceCollection>>();
 
-        public void Add(Action<IServiceCollection> configure)
+        public void Add(Action<IConfiguration, IServiceCollection> configure)
         {
             Debug.Assert(configure != null);
             _delegates.Add(configure);
@@ -23,32 +23,16 @@ namespace System
         {
             Debug.Assert(configuration != null);
 
-            var services = new ServiceCollection();
+            var container = new ServiceCollection();
 
-            services.AddSingleton(configuration);
-            services.AddOptions();
-            services.AddLogging();
+            container.AddSingleton(configuration);
+            container.AddOptions();
+            container.AddLogging();
 
             foreach (var configure in _delegates)
-                configure(services);
+                configure(configuration, container);
 
-            return GetProviderFromFactory(services);
-        }
-
-        private IServiceProvider GetProviderFromFactory(IServiceCollection collection)
-        {
-            var provider = collection.BuildServiceProvider();
-            var factory = provider.GetService<IServiceProviderFactory<IServiceCollection>>();
-
-            if (factory != null)
-            {
-                using (provider)
-                {
-                    return factory.CreateServiceProvider(factory.CreateBuilder(collection));
-                }
-            }
-
-            return provider;
+            return container.GetProviderFromFactory();
         }
     }
 }

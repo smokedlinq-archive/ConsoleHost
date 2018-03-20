@@ -12,7 +12,6 @@ The magic of command line parsing, dependency injection, and logging is handled 
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 
 static class Program
 {
@@ -47,7 +46,7 @@ static class Program
     {
         ConsoleHost
             .CreateBuilder(args)
-			.ConfigureServices(container => container.AddTransient<MyService>())
+            .ConfigureServices(container => container.AddTransient<MyService>())
             .Build()
             .Run()
     }
@@ -189,5 +188,40 @@ public class AppConfig
         {
             { "--name", $"{nameof(AppConfig)}:{nameof(Name)}" }
         };
+}
+```
+
+## Microsoft Application Insights
+The Console.Host.ApplicationInsights library adds support for Microsoft Application Insights telemetry through dependency injection and configuration.
+
+In addition of having access to the TelemetryClient, the execution of the RunAsync method is automatically tracked (via DependencyTelemetry) and captures any unhandled exceptions as ExceptionTelemetry.
+
+```csharp
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.ApplicationInsights;
+
+static class Program
+{
+    static void Main(string[] args)
+    {
+        ConsoleHost
+            .CreateBuilder(args)
+            .UseApplicationInsights(" *your key* ")
+            .Build()
+            .Run()
+    }
+}
+
+public class ConsoleApp : IConsoleApp
+{
+    private readonly TelemetryClient _telemetryClient;
+    
+    public ConsoleApp(TelemetryClient telemetryClient)
+        => _telemetryClient = telemetryClient ?? new TelemetryClient();
+
+    public async Task RunAsync(CancellationToken cancellationToken)
+        => await Console.Out.WriteLineAsync("Hello World!");
 }
 ```
