@@ -92,7 +92,7 @@ namespace Tests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(AggregateException))]
+        [ExpectedException(typeof(InvalidOperationException))]
         public void MockConsoleAppThatLogsAndThrowsInvalidOperationException_ShouldBe_Successful()
         {
             ConsoleHost
@@ -101,17 +101,6 @@ namespace Tests
                     .UseApp<MockConsoleAppThatThrowsAnInvalidOperationException>(replace: true)
                     .Build()
                     .Run();
-        }
-
-        [TestMethod]
-        public void MockConsoleAppThatWantsOperationTelemetry_ShouldBe_Successful()
-        {
-            ConsoleHost
-                .CreateBuilder(new string[0])
-                .UseApplicationInsights(InstrumentationKey)
-                .UseApp<MockConsoleAppThatWantsOperationTelemetry>(replace: true)
-                .Build()
-                .Run();
         }
     }
 }

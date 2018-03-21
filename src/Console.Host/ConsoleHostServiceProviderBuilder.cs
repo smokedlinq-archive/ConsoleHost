@@ -19,11 +19,11 @@ namespace System
             _delegates.Add(configure);
         }
 
-        public IServiceProvider Build(IConfiguration configuration)
+        public IServiceProvider Build(IConfiguration configuration, out IServiceCollection container)
         {
             Debug.Assert(configuration != null);
 
-            var container = new ServiceCollection();
+            container = new ServiceCollection();
 
             container.AddSingleton(configuration);
             container.AddOptions();

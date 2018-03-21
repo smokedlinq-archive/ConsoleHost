@@ -7,30 +7,35 @@ namespace System
 {
     internal static class ObservableConsoleAppExtensions
     {
-        public static void Start(this IEnumerable<IConsoleAppObserver> observers, IConsoleApp app)
+        public static void OnStarting(this IEnumerable<IConsoleAppObserver> observers, IConsoleApp app)
         {
             Debug.Assert(observers != null);
             Debug.Assert(app != null);
-
-            foreach (var observer in observers)
-                observer.OnStarting(app);
+            observers.OnEvent(observer => observer.OnStarting(app));
         }
 
-        public static void Exception(this IEnumerable<IConsoleAppObserver> observers, IConsoleApp app, Exception ex)
+        public static void OnException(this IEnumerable<IConsoleAppObserver> observers, IConsoleApp app, Exception ex)
         {
             Debug.Assert(observers != null);
             Debug.Assert(app != null);
-
-            foreach (var observer in observers)
-                observer.OnException(app, ex);
+            Debug.Assert(ex != null);
+            observers.OnEvent(observer => observer.OnException(app, ex));
         }
 
-        public static void Complete(this IEnumerable<IConsoleAppObserver> observers, IConsoleApp app)
+        public static void OnCompleted(this IEnumerable<IConsoleAppObserver> observers, IConsoleApp app)
         {
             Debug.Assert(observers != null);
+            Debug.Assert(app != null);
+            observers.OnEvent(observer => observer.OnCompleted(app));
+        }
+
+        private static void OnEvent(this IEnumerable<IConsoleAppObserver> observers, Action<IConsoleAppObserver> callback)
+        {
+            Debug.Assert(observers != null);
+            Debug.Assert(callback != null);
 
             foreach (var observer in observers)
-                observer.OnCompleted(app);
+                callback(observer);
         }
     }
 }

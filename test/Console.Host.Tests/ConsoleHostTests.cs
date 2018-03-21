@@ -13,7 +13,7 @@ namespace Tests
     public class ConsoleHostTests
     {
         [TestMethod]
-        [ExpectedException(typeof(AggregateException))]
+        [ExpectedException(typeof(InvalidOperationException))]
         public void MockConsoleAppThatThrowsAnException_ShouldNotBe_Successful()
         {
             ConsoleHost

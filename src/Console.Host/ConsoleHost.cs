@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -11,12 +12,12 @@ namespace System
 {
     public sealed class ConsoleHost : IConsoleHost
     {
-        private readonly IServiceProvider _services;
+        private readonly IServiceCollection _container;
         private readonly ILogger<ConsoleHost> _logger;
         
-        public ConsoleHost(IServiceProvider services, ILogger<ConsoleHost> logger)
+        public ConsoleHost(IServiceCollection container, ILogger<ConsoleHost> logger)
         {
-            _services = services ?? throw new ArgumentNullException(nameof(services));
+            _container = container ?? throw new ArgumentNullException(nameof(container));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -25,15 +26,17 @@ namespace System
 
         public void Run(CancellationToken cancellationToken = default)
         {
-            var apps = _services.GetServices<IConsoleApp>();
+            var services = _container.GetProviderFromFactory();
+            var apps = services.GetServices<IConsoleApp>();
             
             if (!apps.Any())
                 throw new InvalidOperationException($"No service for type '{typeof(IConsoleApp)}' has been registered.");
 
             using (var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken))
             {
-                var observers = _services.GetServices<IConsoleAppObserver>();
-                var tasks = new List<Task>(apps.Count());
+                var observers = services.GetServices<IConsoleHostObserver>();
+
+                observers.OnStarting();
 
                 Console.CancelKeyPress += (sender, e) =>
                 {
@@ -43,24 +46,7 @@ namespace System
 
                 try
                 {
-                    foreach (var app in apps)
-                    {
-                        observers.Start(app);
-
-                        tasks.Add(
-                            app.RunAsync(cts.Token)
-                                .ContinueWith(task =>
-                                {
-                                    if (task.IsFaulted)
-                                        observers.Exception(app, task.Exception);
-
-                                    observers.Complete(app);
-
-                                    if (task.IsFaulted)
-                                        throw task.Exception;
-                                }, cts.Token));
-                    }
-
+                    var tasks = apps.Select(app => RunAsync(services, app, cts.Token));
                     Task.WhenAll(tasks).GetAwaiter().GetResult();
                 }
                 catch (TaskCanceledException)
@@ -70,14 +56,42 @@ namespace System
                 catch (Exception ex)
                 {
                     cts.Cancel();
+                    observers.OnException(ex);
                     _logger.LogCritical(ex, ex.Message);
                     throw;
                 }
                 finally
                 {
-                    if (_services is IDisposable dispoable)
+                    observers.OnCompleted();
+
+                    if (services is IDisposable dispoable)
                         dispoable.Dispose();
                 }
+            }
+        }
+
+        private async Task RunAsync(IServiceProvider services, IConsoleApp app, CancellationToken cancellationToken)
+        {
+            Debug.Assert(services != null);
+            Debug.Assert(app != null);
+
+            var observers = services.GetServices<IConsoleAppObserver>();
+
+            observers.OnStarting(app);
+
+            try
+            {
+                await app.RunAsync(cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                observers.OnException(app, ex);
+                _logger.LogCritical(ex, "[{0}] {1}", app.GetType().FullName, ex.Message);
+                throw;
+            }
+            finally
+            {
+                observers.OnCompleted(app);
             }
         }
     }

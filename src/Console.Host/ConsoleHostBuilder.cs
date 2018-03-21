@@ -75,10 +75,10 @@ namespace System
         public IConsoleHost Build()
         {
             var config = _appConfigurationBuilder.Build(_config);
-            var services = _servicesBuilder.Build(config);
+            var services = _servicesBuilder.Build(config, out var container);
             var logger = _loggerBuilder.Build(services);
 
-            return new ConsoleHost(services, logger.CreateLogger<ConsoleHost>());
+            return new ConsoleHost(container, logger.CreateLogger<ConsoleHost>());
         }
     }
 }

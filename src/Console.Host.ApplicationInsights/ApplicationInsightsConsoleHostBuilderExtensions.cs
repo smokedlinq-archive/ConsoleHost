@@ -54,7 +54,8 @@ namespace Microsoft.ApplicationInsights
                     container.AddSingleton<TelemetryClient>();
                     container.AddSingleton(module);
 
-                    container.AddSingleton(typeof(IConsoleAppObserver), typeof(ConsoleAppObserver));
+                    container.AddSingleton(typeof(IConsoleHostObserver), typeof(ApplicationInsightsConsoleHostObserver));
+                    container.AddSingleton(typeof(IConsoleAppObserver), typeof(ApplicationInsightsConsoleAppObserver));
                 }
             });
 
