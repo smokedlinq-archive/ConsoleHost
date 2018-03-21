@@ -15,6 +15,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Console.Host.Abstractions\Console.Host.Abstractions.csproj" />
     <ProjectReference Include="..\..\src\Console.Host.ApplicationInsights\Console.Host.ApplicationInsights.csproj" />
+    <ProjectReference Include="..\..\src\Console.Host.Dataflow\Console.Host.Dataflow.csproj" />
     <ProjectReference Include="..\..\src\Console.Host\Console.Host.csproj" />
   </ItemGroup>
 

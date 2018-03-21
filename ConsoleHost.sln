@@ -16,7 +16,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		readme.md = readme.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Console.Host.ApplicationInsights", "src\Console.Host.ApplicationInsights\Console.Host.ApplicationInsights.csproj", "{7AFBB031-750A-4AAB-9CD7-548357D372AA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Console.Host.ApplicationInsights", "src\Console.Host.ApplicationInsights\Console.Host.ApplicationInsights.csproj", "{7AFBB031-750A-4AAB-9CD7-548357D372AA}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Console.Host.Dataflow", "src\Console.Host.Dataflow\Console.Host.Dataflow.csproj", "{2BCDC79F-6828-4090-99A0-4CD7F135FAEC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -40,6 +42,10 @@ Global
 		{7AFBB031-750A-4AAB-9CD7-548357D372AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7AFBB031-750A-4AAB-9CD7-548357D372AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7AFBB031-750A-4AAB-9CD7-548357D372AA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2BCDC79F-6828-4090-99A0-4CD7F135FAEC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2BCDC79F-6828-4090-99A0-4CD7F135FAEC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2BCDC79F-6828-4090-99A0-4CD7F135FAEC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2BCDC79F-6828-4090-99A0-4CD7F135FAEC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
