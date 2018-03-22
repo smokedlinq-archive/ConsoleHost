@@ -1,5 +1,7 @@
 # ConsoleHost Library
 [![SonarCloud Status](https://sonarcloud.io/api/project_badges/measure?project=ConsoleHost&metric=alert_status)](https://sonarcloud.io/dashboard?id=ConsoleHost)
+[![NuGet](https://img.shields.io/nuget/dt/Console.Host.svg)](https://www.nuget.org/packages/Console.Host)
+[![NuGet](https://img.shields.io/nuget/vpre/Console.Host.svg)](https://www.nuget.org/packages/Console.Host)
 
 The library is based on .NET Standard 2.0 compliance which enables the console app to run on any platform that supports .NET Standard 2.0 runtimes.
 
