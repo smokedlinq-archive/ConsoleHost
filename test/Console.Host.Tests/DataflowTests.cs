@@ -32,7 +32,7 @@ namespace Tests
             var items = Enumerable
                             .Range(1, 10)
                             .ToBufferBlock()
-                            .Transform(async i => await Task.FromResult(i * 2))
+                            .Transform(async i => await Task.FromResult(i * 2).ConfigureAwait(false))
                             .AsEnumerable()
                             .ToList();
 
@@ -62,7 +62,7 @@ namespace Tests
             Enumerable
                 .Range(1, 10)
                 .ToBufferBlock()
-                .Action(async i => { sum += i; await Task.CompletedTask; })
+                .Action(async i => { sum += i; await Task.CompletedTask.ConfigureAwait(false); })
                 .Completion.Wait();
 
             Assert.AreEqual(55, sum);
@@ -90,12 +90,14 @@ namespace Tests
         {
             var complete = false;
 
-            Enumerable
-                .Range(1, 10)
-                .ToBufferBlock()
-                .OnCompletion(_ => complete = true)
-                .AsEnumerable()
-                .ToList();
+            var items = Enumerable
+                        .Range(1, 10)
+                        .ToBufferBlock()
+                        .OnCompletion(_ => complete = true)
+                        .AsEnumerable()
+                        .ToList();
+
+            Assert.AreEqual(10, items.Count);
 
             // A delay is needed as this is sync and the completion happens async
             Task.Delay(500).Wait();

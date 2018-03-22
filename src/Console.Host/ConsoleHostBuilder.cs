@@ -21,7 +21,7 @@ namespace System
 
         public ConsoleHostBuilder(string[] args = null)
         {
-            _args = args ?? new string[0];
+            _args = args ?? Array.Empty<string>();
             _config = new ConfigurationBuilder()
                         .AddCommandLine(args)
                         .AddEnvironmentVariables()

@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Microsoft.ApplicationInsights
 {
-    internal class ApplicationInsightsLoggerProvider : ILoggerProvider
+    internal sealed class ApplicationInsightsLoggerProvider : ILoggerProvider
     {
         private readonly TelemetryClient _telemetryClient;
 
@@ -20,6 +20,7 @@ namespace Microsoft.ApplicationInsights
 
         public void Dispose()
         {
+            // NOOP
         }
     }
 }

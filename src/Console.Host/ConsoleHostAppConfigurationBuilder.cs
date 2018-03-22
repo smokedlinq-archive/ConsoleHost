@@ -6,7 +6,7 @@ using System.Text;
 
 namespace System
 {
-    internal class ConsoleHostAppConfigurationBuilder
+    internal sealed class ConsoleHostAppConfigurationBuilder
     {
         private readonly List<Action<IConfigurationBuilder>> _delegates = new List<Action<IConfigurationBuilder>>();
 
@@ -18,7 +18,8 @@ namespace System
 
         public IConfiguration Build(IConfiguration config)
         {
-            var builder = new ConfigurationBuilder();
+            var builder = new ConfigurationBuilder()
+                            .AddInMemoryCollection(config.AsEnumerable());
 
             foreach (var configure in _delegates)
                 configure(builder);

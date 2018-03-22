@@ -8,7 +8,7 @@ using System.Reflection;
 
 namespace Microsoft.ApplicationInsights
 {
-    internal class ApplicationInsightsConsoleHostObserver : IConsoleHostObserver, IDisposable
+    internal sealed class ApplicationInsightsConsoleHostObserver : IConsoleHostObserver, IDisposable
     {
         private readonly TelemetryClient _telemetryClient;
         private IOperationHolder<DependencyTelemetry> _operation;

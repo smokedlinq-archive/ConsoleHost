@@ -6,7 +6,7 @@ namespace System.Threading.Tasks.Dataflow
 {
     public static class BufferBlockFromEnumerable
     {
-        public static ISourceBlock<T> ToBufferBlock<T>(this Task<IEnumerable<T>> source, CancellationToken cancellationToken = default(CancellationToken), DataflowBlockOptions dataflowBlockOptions = null)
+        public static ISourceBlock<T> ToBufferBlock<T>(this Task<IEnumerable<T>> source, DataflowBlockOptions dataflowBlockOptions = null, CancellationToken cancellationToken = default)
         {
             if (source == null)
                 throw new ArgumentNullException(nameof(source));
@@ -15,14 +15,14 @@ namespace System.Threading.Tasks.Dataflow
 
             Task.Run(async () =>
             {
-                var items = await source;
+                var items = await source.ConfigureAwait(false);
 
                 foreach (var item in items)
                 {
                     if (cancellationToken.IsCancellationRequested)
                         break;
 
-                    await block.SendAsync(item, cancellationToken);
+                    await block.SendAsync(item, cancellationToken).ConfigureAwait(false);
                 }
 
                 block.Complete();
@@ -31,17 +31,17 @@ namespace System.Threading.Tasks.Dataflow
                 {
                     if (t.IsFaulted)
                         ((IDataflowBlock)block).Fault(t.Exception);
-                }, cancellationToken);
+                }, cancellationToken, TaskContinuationOptions.None, TaskScheduler.Current);
 
             return block;
         }
 
-        public static ISourceBlock<T> ToBufferBlock<T>(this IEnumerable<T> source, CancellationToken cancellationToken = default(CancellationToken), DataflowBlockOptions dataflowBlockOptions = null)
+        public static ISourceBlock<T> ToBufferBlock<T>(this IEnumerable<T> source, DataflowBlockOptions dataflowBlockOptions = null, CancellationToken cancellationToken = default)
         {
             if (source == null)
                 throw new ArgumentNullException(nameof(source));
 
-            return Task.FromResult(source).ToBufferBlock(cancellationToken, dataflowBlockOptions);
+            return Task.FromResult(source).ToBufferBlock(dataflowBlockOptions, cancellationToken);
         }
     }
 }

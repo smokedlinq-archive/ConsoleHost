@@ -11,7 +11,7 @@ namespace System.Threading.Tasks.Dataflow
             if (source == null)
                 throw new ArgumentNullException(nameof(source));
 
-            source.Completion.ContinueWith(continuationAction, cancellationToken);
+            source.Completion.ContinueWith(continuationAction, cancellationToken, TaskContinuationOptions.None, TaskScheduler.Current);
             
             return source;
         }

@@ -8,7 +8,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Tests
 {
-    internal class MockConsoleAppThatWaitsForCancellation : IConsoleApp
+    internal sealed class MockConsoleAppThatWaitsForCancellation : IConsoleApp
     {
         public Task RunAsync(CancellationToken cancellationToken)
         {

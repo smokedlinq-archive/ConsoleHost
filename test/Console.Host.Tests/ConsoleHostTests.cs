@@ -14,40 +14,40 @@ namespace Tests
     {
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void MockConsoleAppThatThrowsAnException_ShouldNotBe_Successful()
+        public void MockConsoleAppThatThrowsAnExceptionShouldNotBeSuccessful()
         {
             ConsoleHost
-                .CreateBuilder(new string[0])
+                .CreateBuilder(MockCommandLineArgs.Empty)
                 .UseApp<MockConsoleAppThatThrowsAnInvalidOperationException>()
                 .Build()
                 .Run();
         }
 
         [TestMethod]
-        public void MockConsoleApp_ConfiguredWithExplicitServiceProviderFactory_ShouldBe_Sucessful()
+        public void MockConsoleAppConfiguredWithExplicitServiceProviderFactoryShouldBeSucessful()
         {
             ConsoleHost
-                .CreateBuilder(new string[0])
+                .CreateBuilder(MockCommandLineArgs.Empty)
                 .ConfigureServices(container => container.AddSingleton<IServiceProviderFactory<IServiceCollection>>(_ => new DefaultServiceProviderFactory()))
                 .Build()
                 .Run();
         }
 
         [TestMethod]
-        public void MockConsoleApp_ShouldBe_Sucessful()
+        public void MockConsoleAppShouldBeSucessful()
         {
             ConsoleHost
-                .CreateBuilder(new string[0])
+                .CreateBuilder(MockCommandLineArgs.Empty)
                 .UseApp<MockConsoleApp>()
                 .Build()
                 .Run();
         }
 
         [TestMethod]
-        public void ConfiguredMockConsoleApp_ShouldBe_Sucessful()
+        public void ConfiguredMockConsoleAppShouldBeSucessful()
         {
             ConsoleHost
-                .CreateBuilder(new string[0])
+                .CreateBuilder(MockCommandLineArgs.Empty)
                 .ConfigureCommandLine<MockConsoleAppConfig>(MockConsoleAppConfig.SwitchMappings)
                 .Configure(x => { })
                 .ConfigureAppConfiguration(_ => { })
@@ -60,20 +60,20 @@ namespace Tests
         }
 
         [TestMethod]
-        public void ImplicitlyConfiguredMockConsoleApp_ShouldBe_Successful()
+        public void ImplicitlyConfiguredMockConsoleAppShouldBeSuccessful()
         {
             ConsoleHost
-                .CreateBuilder(new string[0])
+                .CreateBuilder(MockCommandLineArgs.Empty)
                 .Build()
                 .Run();
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void NoConsoleApp_ShouldNotBe_Successful()
+        public void NoConsoleAppShouldNotBeSuccessful()
         {
             ConsoleHost
-                .CreateBuilder(new string[0])
+                .CreateBuilder(MockCommandLineArgs.Empty)
                 .ConfigureServices(container =>
                 {
                     var descriptors = container.Where(d => d.ServiceType == typeof(IConsoleApp)).ToArray();
@@ -85,10 +85,10 @@ namespace Tests
         }
 
         [TestMethod]
-        public void MultipleConsoleApp_ShouldBe_Successful()
+        public void MultipleConsoleAppShouldBeSuccessful()
         {
             ConsoleHost
-                .CreateBuilder(new string[0])
+                .CreateBuilder(MockCommandLineArgs.Empty)
                 .UseApp<MockConsoleApp>()
                 .UseApp<MockConsoleApp>()
                 .Build()
@@ -96,7 +96,7 @@ namespace Tests
         }
 
         [TestMethod]
-        public void MockConsoleAppThatValidatesMockConsoleAppConfigFromCommandLine_ShouldBe_Successful()
+        public void MockConsoleAppThatValidatesMockConsoleAppConfigFromCommandLineShouldBeSuccessful()
         {
             ConsoleHost
                 .CreateBuilder(MockConsoleAppThatValidatesMockConsoleAppConfigFromCommandLine.Args)
@@ -106,7 +106,7 @@ namespace Tests
         }
 
         [TestMethod]
-        public void MockConsoleAppThatWaitsForCancellation_ShouldBe_Successful()
+        public void MockConsoleAppThatWaitsForCancellationShouldBeSuccessful()
         {
             var cts = new CancellationTokenSource();
 

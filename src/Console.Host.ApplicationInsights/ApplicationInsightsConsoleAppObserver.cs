@@ -8,7 +8,7 @@ using System.Reflection;
 
 namespace Microsoft.ApplicationInsights
 {
-    internal class ApplicationInsightsConsoleAppObserver : IConsoleAppObserver, IDisposable
+    internal sealed class ApplicationInsightsConsoleAppObserver : IConsoleAppObserver, IDisposable
     {
         private readonly TelemetryClient _telemetryClient;
         private readonly ConcurrentDictionary<IConsoleApp, IOperationHolder<DependencyTelemetry>> _operations = new ConcurrentDictionary<IConsoleApp, IOperationHolder<DependencyTelemetry>>();

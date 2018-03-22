@@ -11,6 +11,7 @@ namespace Tests
     {
         public void Configure(IServiceCollection container)
         {
+            // MOCK FOR UNIT TESTS
         }
     }
 }

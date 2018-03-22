@@ -25,11 +25,11 @@ namespace Tests
         }
 
         [TestMethod]
-        public void ConsoleHostBuilderWithNoInstrumentationKey_ShouldBe_Successful()
+        public void ConsoleHostBuilderWithNoInstrumentationKeyShouldBeSuccessful()
         {
             var host = 
                 ConsoleHost
-                    .CreateBuilder(new string[0])
+                    .CreateBuilder(MockCommandLineArgs.Empty)
                     .UseApplicationInsights()
                     .Build();
 
@@ -38,11 +38,11 @@ namespace Tests
         }
 
         [TestMethod]
-        public void ConsoleHostBuilderWithExplicitInstrumentationKey_ShouldBe_Successful()
+        public void ConsoleHostBuilderWithExplicitInstrumentationKeyShouldBeSuccessful()
         {
             var host =
                 ConsoleHost
-                    .CreateBuilder(new string[0])
+                    .CreateBuilder(MockCommandLineArgs.Empty)
                     .UseApplicationInsights(InstrumentationKey)
                     .Build();
 
@@ -51,13 +51,13 @@ namespace Tests
         }
 
         [TestMethod]
-        public void ConsoleHostBuilderWithEnvironmentInstrumentationKey_ShouldBe_Successful()
+        public void ConsoleHostBuilderWithEnvironmentInstrumentationKeyShouldBeSuccessful()
         {
             Environment.SetEnvironmentVariable("APPLICATIONINSIGHTS_INSTRUMENTATIONKEY", InstrumentationKey);
 
             var host =
                 ConsoleHost
-                    .CreateBuilder(new string[0])
+                    .CreateBuilder(MockCommandLineArgs.Empty)
                     .UseApplicationInsights()
                     .Build();
 
@@ -66,11 +66,11 @@ namespace Tests
         }
 
         [TestMethod]
-        public void ConsoleHostBuilderWithConfigurationInstrumentationKey_ShouldBe_Successful()
+        public void ConsoleHostBuilderWithConfigurationInstrumentationKeyShouldBeSuccessful()
         {
             var host =
                 ConsoleHost
-                    .CreateBuilder(new string[0])
+                    .CreateBuilder(MockCommandLineArgs.Empty)
                     .ConfigureAppConfiguration(builder => builder.AddInMemoryCollection(new Dictionary<string, string> { { "ApplicationInsights:InstrumentationKey", InstrumentationKey }, { "ApplicationInsights:TelemetryChannel:DeveloperMode", "true" } }))
                     .UseApplicationInsights()
                     .Build();
@@ -81,10 +81,10 @@ namespace Tests
         }
 
         [TestMethod]
-        public void MockConsoleAppThatLogs_ShouldBe_Successful()
+        public void MockConsoleAppThatLogsShouldBeSuccessful()
         {
             ConsoleHost
-                    .CreateBuilder(new string[0])
+                    .CreateBuilder(MockCommandLineArgs.Empty)
                     .UseApplicationInsights(InstrumentationKey)
                     .UseApp<MockConsoleAppThatLogs>(replace: true)
                     .Build()
@@ -93,10 +93,10 @@ namespace Tests
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void MockConsoleAppThatLogsAndThrowsInvalidOperationException_ShouldBe_Successful()
+        public void MockConsoleAppThatLogsAndThrowsInvalidOperationExceptionShouldBeSuccessful()
         {
             ConsoleHost
-                    .CreateBuilder(new string[0])
+                    .CreateBuilder(MockCommandLineArgs.Empty)
                     .UseApplicationInsights(InstrumentationKey)
                     .UseApp<MockConsoleAppThatThrowsAnInvalidOperationException>(replace: true)
                     .Build()

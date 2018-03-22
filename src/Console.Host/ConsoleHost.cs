@@ -81,7 +81,7 @@ namespace System
 
             try
             {
-                await app.RunAsync(cancellationToken);
+                await app.RunAsync(cancellationToken).ConfigureAwait(false);
             }
             catch (Exception ex)
             {

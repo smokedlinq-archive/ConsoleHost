@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Tests
 {
-    internal class MockConsoleAppThatValidatesMockConsoleAppConfigFromCommandLine : IConsoleApp
+    internal sealed class MockConsoleAppThatValidatesMockConsoleAppConfigFromCommandLine : IConsoleApp
     {
         internal static readonly string[] Args =
             new string[]
@@ -28,10 +29,10 @@ namespace Tests
         public Task RunAsync(CancellationToken cancellationToken)
         {
             Assert.AreEqual(Args[1], _config.StringValue);
-            Assert.AreEqual(Int32.Parse(Args[3]), _config.Int32Value);
+            Assert.AreEqual(Int32.Parse(Args[3], CultureInfo.CurrentCulture), _config.Int32Value);
             Assert.AreEqual(Boolean.Parse(Args[5]), _config.BooleanValue);
-            Assert.AreEqual(DateTime.Parse(Args[7]), _config.DateTimeValue);
-            Assert.AreEqual(TimeSpan.Parse(Args[9]), _config.TimeSpanValue);
+            Assert.AreEqual(DateTime.Parse(Args[7], CultureInfo.CurrentCulture), _config.DateTimeValue);
+            Assert.AreEqual(TimeSpan.Parse(Args[9], CultureInfo.CurrentCulture), _config.TimeSpanValue);
 
             return Task.CompletedTask;
         }

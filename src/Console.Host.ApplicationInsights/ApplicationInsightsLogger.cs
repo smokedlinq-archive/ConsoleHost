@@ -38,15 +38,17 @@ namespace Microsoft.ApplicationInsights
 
                 if (exception == null)
                 {
-                    var traceTelemetry = new TraceTelemetry(formatter(state, exception), this.GetSeverityLevel(logLevel));
+                    var traceTelemetry = new TraceTelemetry(formatter(state, exception), GetSeverityLevel(logLevel));
                     PopulateTelemetry(traceTelemetry, stateDictionary, eventId);
                     _telemetryClient.TrackTrace(traceTelemetry);
                 }
                 else
                 {
-                    var exceptionTelemetry = new ExceptionTelemetry(exception);
-                    exceptionTelemetry.Message = formatter(state, exception);
-                    exceptionTelemetry.SeverityLevel = this.GetSeverityLevel(logLevel);
+                    var exceptionTelemetry = new ExceptionTelemetry(exception)
+                    {
+                        Message = formatter(state, exception),
+                        SeverityLevel = GetSeverityLevel(logLevel)
+                    };
                     exceptionTelemetry.Context.Properties["Exception"] = exception.ToString();
                     PopulateTelemetry(exceptionTelemetry, stateDictionary, eventId);
                     _telemetryClient.TrackException(exceptionTelemetry);
@@ -78,7 +80,7 @@ namespace Microsoft.ApplicationInsights
             }
         }
 
-        private SeverityLevel GetSeverityLevel(LogLevel logLevel)
+        private static SeverityLevel GetSeverityLevel(LogLevel logLevel)
         {
             switch (logLevel)
             {

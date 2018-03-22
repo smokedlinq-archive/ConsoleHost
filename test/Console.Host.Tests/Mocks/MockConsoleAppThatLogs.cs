@@ -11,15 +11,12 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Tests
 {
-    internal class MockConsoleAppThatLogs : IConsoleApp
+    internal sealed class MockConsoleAppThatLogs : IConsoleApp
     {
-        private readonly TelemetryClient _telemetryClient;
-
         public MockConsoleAppThatLogs(ILogger<MockConsoleAppThatLogs> logger, TelemetryClient telemetryClient)
         {
-            _telemetryClient = telemetryClient;
-            _telemetryClient.TrackTrace("Mock log data from MockConsoleAppThatLogs", SeverityLevel.Information, new Dictionary<string, string> { { "MockConsoleAppThatLogs", "true" } });
-            _telemetryClient.TrackException(new Exception("Mock exception MockConsoleAppThatLogs"), new Dictionary<string, string> { { "MockConsoleAppThatLogs", "true" } });
+            telemetryClient.TrackTrace("Mock log data from MockConsoleAppThatLogs", SeverityLevel.Information, new Dictionary<string, string> { { "MockConsoleAppThatLogs", "true" } });
+            telemetryClient.TrackException(new Exception("Mock exception MockConsoleAppThatLogs"), new Dictionary<string, string> { { "MockConsoleAppThatLogs", "true" } });
             logger.LogTrace("Mock log data from MockConsoleAppThatLogs");
             logger.LogError(new Exception("Mock exception from MockConsoleAppThatLogs"), "Mock log exception from MockConsoleAppThatLogs");
         }
