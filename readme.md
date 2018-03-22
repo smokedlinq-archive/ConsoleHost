@@ -1,4 +1,5 @@
-# ConsoleHost Library
+Console.Host
+=======
 [![SonarCloud Status](https://sonarcloud.io/api/project_badges/measure?project=ConsoleHost&metric=alert_status)](https://sonarcloud.io/dashboard?id=ConsoleHost)
 [![NuGet](https://img.shields.io/nuget/dt/Console.Host.svg)](https://www.nuget.org/packages/Console.Host)
 [![NuGet](https://img.shields.io/nuget/vpre/Console.Host.svg)](https://www.nuget.org/packages/Console.Host)
@@ -8,6 +9,14 @@ The library is based on .NET Standard 2.0 compliance which enables the console a
 The basic usage of a ConsoleHost requires creating a ConsoleHostBuilder, building the ConsoleHost instance, and calling it's Run() method. 
 
 The magic of command line parsing, dependency injection, and logging is handled by the ConsoleHost instance.
+
+## Installing Console.Host
+You should install [Console.Host](https://www.nuget.org/packages/Console.Host) with NuGet:
+```powershell
+Install-Package Console.Host
+Install-Package Console.Host.ApplicationInsights
+Install-Package Console.Host.Dataflow
+```
 
 ## Usage
 ```csharp
