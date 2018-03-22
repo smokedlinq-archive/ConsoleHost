@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +13,51 @@ namespace Tests
     [TestClass]
     public class DataflowTests
     {
+        [TestMethod]
+        public void ConsoleHostWithDataflowApp()
+        {
+            var sum = 0;
+
+            ConsoleHost
+                .CreateBuilder(MockCommandLineArgs.Empty)
+                .UseDataflow(_ =>
+                    Enumerable
+                        .Range(1, 10)
+                        .ToBufferBlock()
+                        .Transform(i => i * 2)
+                        .Action(i => sum += i))
+                .Build()
+                .Run();
+
+            Assert.AreEqual(110, sum);
+        }
+        [TestMethod]
+        public void ConsoleHostWithDataflowAppAndConfig()
+        {
+            var sum = 0;
+
+            ConsoleHost
+                .CreateBuilder(MockCommandLineArgs.Empty)
+                .UseDataflow(context =>
+                {
+                    var config = context.Services.GetRequiredService<MockDataflowAppConfig>();
+                    var dataflowBlockOptions = new ExecutionDataflowBlockOptions
+                    {
+                        MaxDegreeOfParallelism = config.MaxDegreeOfParallelism
+                    };
+
+                    return Enumerable
+                            .Range(1, 10)
+                            .ToBufferBlock()
+                            .Transform(i => i * 2, dataflowBlockOptions: dataflowBlockOptions)
+                            .Action(i => sum += i);
+                })
+                .Build()
+                .Run();
+
+            Assert.AreEqual(110, sum);
+        }
+
         [TestMethod]
         public void TestEnumerableToBufferBlockWithTransformAndAsEnumerable()
         {

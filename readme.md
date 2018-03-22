@@ -20,7 +20,7 @@ static class Program
         ConsoleHost
             .CreateBuilder(args)
             .Build()
-            .Run()
+            .Run();
     }
 }
 
@@ -48,7 +48,7 @@ static class Program
             .CreateBuilder(args)
             .ConfigureServices(container => container.AddTransient<MyService>())
             .Build()
-            .Run()
+            .Run();
     }
 }
 
@@ -86,7 +86,7 @@ static class Program
             .CreateBuilder(args)
             .ConfigureServices(container => container.AddTransient<MyService>())
             .Build()
-            .Run()
+            .Run();
     }
 }
 
@@ -146,7 +146,7 @@ static class Program
             .ConfigureServices(container => container.AddTransient<MyService>())
             .ConfigureLogging(logging => logging.AddConsole().AddDebug())
             .Build()
-            .Run()
+            .Run();
     }
 }
 
@@ -210,7 +210,7 @@ static class Program
             .CreateBuilder(args)
             .UseApplicationInsights(" *your key* ")
             .Build()
-            .Run()
+            .Run();
     }
 }
 
@@ -223,5 +223,53 @@ public class ConsoleApp : IConsoleApp
 
     public async Task RunAsync(CancellationToken cancellationToken)
         => await Console.Out.WriteLineAsync("Hello World!");
+}
+```
+
+## TPL Dataflow
+The Console.Host.Dataflow library adds support for System.Threading.Tasks.Dataflow pipelines as console apps.
+
+```csharp
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+
+static class Program
+{
+    static void Main(string[] args)
+    {
+        ConsoleHost
+            .CreateBuilder(args)
+            .UseDataflow(context =>
+            {
+                var config = context.Services.GetRequiredService<DataflowConfig>();
+                var dataflowBlockOptions = new ExecutionDataflowBlockOptions
+                                            {
+                                                MaxDegreeOfParallelism = config.MaxDegreeOfParallelism
+                                            };
+
+                return Enumerable
+                        .Range(1, 10)
+                        .ToBufferBlock()
+                        .Transform(i => i * 2, dataflowBlockOptions: dataflowBlockOptions)
+                        .Action(i => Console.WriteLine(i))
+            })
+            .Build()
+            .Run();
+    }
+}
+
+public class DataflowConfig
+{
+    public int MaxDegreeOfParallelism { get; set; } = Environment.ProcessorCount;
+
+    public DataflowConfig(IConfiguration config)
+        => config?.GetSection(nameof(DataflowConfig)).Bind(this);
+
+    public static IDictionary<string, string> SwitchMappings
+        => new Dictionary<string, string>
+        {
+            { "--mdop", $"{nameof(DataflowConfig)}:{nameof(MaxDegreeOfParallelism)}" }
+        };
 }
 ```

@@ -4,7 +4,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <BUILD_VERSION>0.0.6.$(BUILD_BUILDID)</BUILD_VERSION>
+    <BUILD_VERSION>0.0.7.$(BUILD_BUILDID)</BUILD_VERSION>
   </PropertyGroup>
 
   <PropertyGroup>
