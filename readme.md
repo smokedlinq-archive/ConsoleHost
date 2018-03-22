@@ -14,8 +14,6 @@ The magic of command line parsing, dependency injection, and logging is handled 
 You should install [Console.Host](https://www.nuget.org/packages/Console.Host) with NuGet:
 ```powershell
 Install-Package Console.Host
-Install-Package Console.Host.ApplicationInsights
-Install-Package Console.Host.Dataflow
 ```
 
 ## Usage
@@ -202,10 +200,20 @@ public class AppConfig
 }
 ```
 
-## Microsoft Application Insights
+Console.Host.ApplicationInsights
+=======
+[![NuGet](https://img.shields.io/nuget/dt/Console.Host.ApplicationInsights.svg)](https://www.nuget.org/packages/Console.Host.ApplicationInsights)
+[![NuGet](https://img.shields.io/nuget/vpre/Console.Host.ApplicationInsights.svg)](https://www.nuget.org/packages/Console.Host.ApplicationInsights)
+
 The Console.Host.ApplicationInsights library adds support for Microsoft Application Insights telemetry through dependency injection and configuration.
 
 In addition of having access to the TelemetryClient, the execution of the RunAsync method is automatically tracked (via DependencyTelemetry) and captures any unhandled exceptions as ExceptionTelemetry.
+
+## Installing Console.Host.ApplicationInsights
+You should install [Console.Host.ApplicationInsights](https://www.nuget.org/packages/Console.Host.ApplicationInsights) with NuGet:
+```powershell
+Install-Package Console.Host.ApplicationInsights
+```
 
 ```csharp
 using System;
@@ -237,8 +245,19 @@ public class ConsoleApp : IConsoleApp
 }
 ```
 
-## TPL Dataflow
+
+Console.Host.Dataflow
+=======
+[![NuGet](https://img.shields.io/nuget/dt/Console.Host.Dataflow.svg)](https://www.nuget.org/packages/Console.Host.Dataflow)
+[![NuGet](https://img.shields.io/nuget/vpre/Console.Host.Dataflow.svg)](https://www.nuget.org/packages/Console.Host.Dataflow)
+
 The Console.Host.Dataflow library adds support for System.Threading.Tasks.Dataflow pipelines as console apps.
+
+## Installing Console.Host.Dataflow
+You should install [Console.Host.Dataflow](https://www.nuget.org/packages/Console.Host.Dataflow) with NuGet:
+```powershell
+Install-Package Console.Host.Dataflow
+```
 
 ```csharp
 using System;
