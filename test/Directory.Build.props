@@ -1,0 +1,8 @@
+<Project>
+
+  <PropertyGroup>
+    <LangVersion>latest</LangVersion>
+    <SonarQubeExclude>true</SonarQubeExclude>
+  </PropertyGroup>
+  
+ </Project>
