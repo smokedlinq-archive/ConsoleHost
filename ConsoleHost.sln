@@ -11,7 +11,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Console.Host.Abstractions",
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{4E21BD8D-81AE-4AE9-97D6-5832ECA3509F}"
 	ProjectSection(SolutionItems) = preProject
-		ConsoleHost.targets = ConsoleHost.targets
 		LICENSE = LICENSE
 		readme.md = readme.md
 	EndProjectSection
@@ -19,6 +18,16 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Console.Host.ApplicationInsights", "src\Console.Host.ApplicationInsights\Console.Host.ApplicationInsights.csproj", "{7AFBB031-750A-4AAB-9CD7-548357D372AA}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Console.Host.Dataflow", "src\Console.Host.Dataflow\Console.Host.Dataflow.csproj", "{2BCDC79F-6828-4090-99A0-4CD7F135FAEC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{8C9F67BA-7D62-4A8E-8A0E-7CB18E064FB6}"
+	ProjectSection(SolutionItems) = preProject
+		test\Directory.Build.targets = test\Directory.Build.targets
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Source", "Source", "{40DCE98E-0135-4A7B-B176-69097510AA40}"
+	ProjectSection(SolutionItems) = preProject
+		src\Directory.Build.targets = src\Directory.Build.targets
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -49,6 +58,13 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{D6756D82-759C-49C3-A729-A3475C36BB13} = {40DCE98E-0135-4A7B-B176-69097510AA40}
+		{DA22610D-E680-443B-B586-517616CC86AE} = {8C9F67BA-7D62-4A8E-8A0E-7CB18E064FB6}
+		{1FB79DF6-9958-4FEF-84CB-70C672CBB6C6} = {40DCE98E-0135-4A7B-B176-69097510AA40}
+		{7AFBB031-750A-4AAB-9CD7-548357D372AA} = {40DCE98E-0135-4A7B-B176-69097510AA40}
+		{2BCDC79F-6828-4090-99A0-4CD7F135FAEC} = {40DCE98E-0135-4A7B-B176-69097510AA40}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {EFC1B73B-F5BF-44EB-99A3-792E2BD2276F}
