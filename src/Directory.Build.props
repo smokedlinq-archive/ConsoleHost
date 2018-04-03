@@ -23,6 +23,7 @@
     <PackageProjectUrl>https://github.com/smokedlinq/ConsoleHost</PackageProjectUrl>
     <RepositoryUrl>https://github.com/smokedlinq/ConsoleHost.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
+    <IncludeSymbols>true</IncludeSymbols>
   </PropertyGroup>
 
  </Project>

@@ -49,7 +49,9 @@ phases:
       - task: VSTest@2
         displayName: Unit Tests
         inputs:
-          testAssemblyVer2: '**\bin\$(BuildConfiguration)\*\*.Tests.dll'
+          testAssemblyVer2: |
+            **\$(BuildConfiguration)\*\*.Tests.dll
+            !**\obj\**
           codeCoverageEnabled: true
           platform: '$(BuildPlatform)'
           configuration: '$(BuildConfiguration)'
