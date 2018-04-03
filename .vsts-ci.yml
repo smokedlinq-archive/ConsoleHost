@@ -18,66 +18,66 @@ phases:
 
     steps:
 
-    - task: NuGetToolInstaller@0
-      displayName: NuGet Install
-      inputs:
-        versionSpec: 4.4.1
+      - task: NuGetToolInstaller@0
+        displayName: NuGet Install
+        inputs:
+          versionSpec: 4.4.1
 
-    - task: NuGetCommand@2
-      displayName: NuGet Restore
-      inputs:
-        restoreSolution: '**/*.sln'
+      - task: NuGetCommand@2
+        displayName: NuGet Restore
+        inputs:
+          restoreSolution: '**/*.sln'
 
-    - task: SonarSource.sonarcloud.14d9cde6-c1da-4d55-aa01-2965cd301255.SonarCloudPrepare@1
-      displayName: SonarCloud Prepare
-      inputs:
-        SonarCloud: 'SonarCloud-ConsoleHost'
-        organization: 'smokedlinq-github'
-        projectKey: ConsoleHost
-        projectName: ConsoleHost
-        projectVersion: '$(Build.BuildNumber)'
-        extraProperties: 'sonar.cs.vscoveragexml.reportsPaths=**/*.coveragexml'
+      - task: SonarSource.sonarcloud.14d9cde6-c1da-4d55-aa01-2965cd301255.SonarCloudPrepare@1
+        displayName: SonarCloud Prepare
+        inputs:
+          SonarCloud: 'SonarCloud-ConsoleHost'
+          organization: 'smokedlinq-github'
+          projectKey: ConsoleHost
+          projectName: ConsoleHost
+          projectVersion: '$(Build.BuildNumber)'
+          extraProperties: 'sonar.cs.vscoveragexml.reportsPaths=**/*.coveragexml'
 
-    - task: VSBuild@1
-      displayName: Build Solution
-      inputs:
-        solution: '**/*.sln'
-        platform: '$(BuildPlatform)'
-        configuration: '$(BuildConfiguration)'
-        clean: true
+      - task: VSBuild@1
+        displayName: Build Solution
+        inputs:
+          solution: '**/*.sln'
+          platform: '$(BuildPlatform)'
+          configuration: '$(BuildConfiguration)'
+          clean: true
 
-    - task: VSTest@2
-      displayName: Unit Tests
-      inputs:
-        testAssemblyVer2: '**\bin\$(BuildConfiguration)\*\*.Tests.dll'
-        codeCoverageEnabled: true
-        platform: '$(BuildPlatform)'
-        configuration: '$(BuildConfiguration)'
+      - task: VSTest@2
+        displayName: Unit Tests
+        inputs:
+          testAssemblyVer2: '**\bin\$(BuildConfiguration)\*\*.Tests.dll'
+          codeCoverageEnabled: true
+          platform: '$(BuildPlatform)'
+          configuration: '$(BuildConfiguration)'
 
-    - task: SonarSource.sonarcloud.ce096e50-6155-4de8-8800-4221aaeed4a1.SonarCloudAnalyze@1
-      displayName: SonarCloud Analyze
+      - task: SonarSource.sonarcloud.ce096e50-6155-4de8-8800-4221aaeed4a1.SonarCloudAnalyze@1
+        displayName: SonarCloud Analyze
 
-    - task: SonarSource.sonarcloud.38b27399-a642-40af-bb7d-9971f69712e8.SonarCloudPublish@1
-      displayName: SonarCloud Publish
+      - task: SonarSource.sonarcloud.38b27399-a642-40af-bb7d-9971f69712e8.SonarCloudPublish@1
+        displayName: SonarCloud Publish
 
-    - task: mspremier.BuildQualityChecks.QualityChecks-task.BuildQualityChecks@3
-      displayName: Build Quality Gate
-      inputs:
-        checkCoverage: true
-        coverageFailOption: fixed
-        coverageThreshold: 80
+      - task: mspremier.BuildQualityChecks.QualityChecks-task.BuildQualityChecks@3
+        displayName: Build Quality Gate
+        inputs:
+          checkCoverage: true
+          coverageFailOption: fixed
+          coverageThreshold: 80
 
-    - task: CopyFiles@2
-      displayName: Stage Artifacts
-      inputs:
-        SourceFolder: '$(Build.SourcesDirectory)'
-        Contents: '**\$(BuildConfiguration)\*.nupkg'
-        TargetFolder: '$(build.artifactstagingdirectory)'
-        flattenFolders: true
+      - task: CopyFiles@2
+        displayName: Stage Artifacts
+        inputs:
+          SourceFolder: '$(Build.SourcesDirectory)'
+          Contents: '**\$(BuildConfiguration)\*.nupkg'
+          TargetFolder: '$(build.artifactstagingdirectory)'
+          flattenFolders: true
 
-    - task: PublishBuildArtifacts@1
-      displayName: Publish Artifacts
-      inputs:
-        PathtoPublish: '$(build.artifactstagingdirectory)'
-        ArtifactName: 'drop'
-        publishLocation: Container
+      - task: PublishBuildArtifacts@1
+        displayName: Publish Artifacts
+        inputs:
+          PathtoPublish: '$(build.artifactstagingdirectory)'
+          ArtifactName: 'drop'
+          publishLocation: Container
